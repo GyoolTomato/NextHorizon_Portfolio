@@ -1,0 +1,30 @@
+# Temporary files
+Temp/
+*.tmp
+*.temp
+
+# Unity metadata (not required in this code-only portfolio repository)
+*.meta
+
+# IDE settings
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.user
+
+# Build outputs
+Build/
+Builds/
+bin/
+obj/
+*.apk
+*.aab
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
