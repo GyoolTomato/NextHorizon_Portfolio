@@ -124,8 +124,35 @@ Firebase Authentication과 Google Sign-In을 사용하여 Google 로그인과 �
 
 캐릭터, 아이템, 장비, 스킬, 미션 및 다국어 텍스트를 JSON 테이블로 분리했습니다. Addressables로 로드한 테이블을 역직렬화하여 게임 로직과 UI에서 공통 데이터로 사용합니다.
 
+#### 데이터 제작 파이프라인
+
+게임 데이터의 원본과 변환 도구를 별도 저장소로 분리했습니다. 기획 데이터는 [NextHorizonTables](https://github.com/GyoolTomato/NextHorizonTables)의 Excel 파일로 관리하고, 직접 개발한 WinForms 도구 [TableDataConverter](https://github.com/GyoolTomato/TableDataConverter)로 Unity에서 사용하는 데이터와 코드를 생성합니다.
+
+```mermaid
+flowchart LR
+    A["NextHorizonTables<br/>Excel 원본 데이터"] --> B["TableDataConverter<br/>유효한 테이블 탐색 및 변환"]
+    B --> C["JSON 형식 .bytes<br/>런타임 데이터"]
+    B --> D["테이블별 C# 클래스"]
+    B --> E["enum 및 TableDataLoader.cs"]
+    C --> F["Unity Addressables"]
+    D --> G["NextHorizon 클라이언트"]
+    E --> G
+    F --> G
+    G --> H["역직렬화 및 키 기반 조회"]
+```
+
+Excel의 2행은 변수명, 3행은 자료형, 4행부터는 실제 데이터로 정의합니다. 컨버터는 `_*.xlsx` 파일을 읽어 다음 산출물을 자동 생성합니다.
+
+- `Assets/Tables`: JSON 형식의 `.bytes` 데이터
+- `Assets/Scripts/_Common/Tables`: 테이블별 C# 클래스와 `TableDataLoader.cs`
+- `Assets/Scripts/_Common/GlobalData`: enum C# 코드
+
+이 구조로 원본 데이터, 자동 생성 코드, 런타임 로딩 로직의 역할을 분리했습니다. 테이블 구조가 변경되어도 Excel과 컨버터를 기준으로 산출물을 다시 생성하므로 반복적인 클래스 작성과 데이터 입력 오류를 줄일 수 있습니다.
+
 주요 처리:
 
+- Excel 기반 원본 테이블과 Unity 산출물 분리
+- `.bytes`, 데이터 클래스, enum 및 로더 코드 자동 생성
 - 콘텐츠 데이터와 로직 분리
 - 테이블별 데이터 모델 구성
 - 키 기반 데이터 조회
@@ -181,7 +208,8 @@ Firebase Authentication과 Google Sign-In을 사용하여 Google 로그인과 �
 | Language | C# |
 | Resource | Unity Addressables |
 | Authentication | Firebase Authentication, Google Sign-In |
-| Data | Newtonsoft.Json, REST API |
+| Data | Excel, ClosedXML, Newtonsoft.Json, REST API |
+| Tool | .NET 8 WinForms, TableDataConverter |
 | Async | MEC Coroutine |
 
 ## 폴더 구조
