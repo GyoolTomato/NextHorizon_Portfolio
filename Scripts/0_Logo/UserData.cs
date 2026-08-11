@@ -1,8 +1,11 @@
 using UnityEngine;
 
+[System.Serializable]
 public class UserData
 {
-    public string uid;
+    public int id;
+    public string localId;
+    public string firebaseUid;
     public string nickname;
     public int level;
     public int exp;
@@ -15,7 +18,7 @@ public class TestLoginFlow : MonoBehaviour
     {
         UserData dummyData = new UserData
         {
-            uid = uid,
+            localId = uid,
             nickname = "TestUser",
             level = 1,
             exp = 20,
@@ -27,7 +30,7 @@ public class TestLoginFlow : MonoBehaviour
 
     void ApplyUserData(UserData data)
     {
-        Debug.Log($"UID: {data.uid}");
+        Debug.Log($"User ID: {data.id}, Local ID: {data.localId}");
         Debug.Log($"닉네임: {data.nickname}");
         Debug.Log($"레벨: {data.level}");
         Debug.Log($"경험치: {data.exp}");

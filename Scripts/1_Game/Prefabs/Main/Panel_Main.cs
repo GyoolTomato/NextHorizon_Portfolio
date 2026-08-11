@@ -164,12 +164,10 @@ public class Panel_Main : Panel_Base
     /// <summary>
     /// 
     /// </summary>
-    public void OnBtnStorage()
+    public void OnBtnInventory()
     {
-        Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextCommon(9000040), Manager_UI.Instance.GetTextSystem(9990007), Panel_MessageBox.EType.OK, () =>
-        {
-            return;
-        });
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Inventory) as Panel_Inventory;
+        panel.Init();
     }
 
     /// <summary>

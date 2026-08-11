@@ -5,7 +5,8 @@ using System.Text;
 public class GlobalData_PlayerInfo
 {
     //
-    public string pUserId { private set; get; }
+    public int pUserId { private set; get; }
+    public string pLocalId { private set; get; }
     public string pUserNickName { private set; get; }
     public long pLevel { private set; get; }
     public long pExp { private set; get; }
@@ -20,7 +21,8 @@ public class GlobalData_PlayerInfo
     /// <param name="userData"></param>
     public void Init(UserData userData)
     {
-        pUserId = userData.uid;
+        pUserId = userData.id;
+        pLocalId = userData.localId;
         pUserNickName = userData.nickname;
         pLevel = userData.level;
         pExp = userData.exp;

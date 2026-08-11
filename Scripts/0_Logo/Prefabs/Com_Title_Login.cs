@@ -291,6 +291,6 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        LogoScene.pStateLogIn.DoLoadUserData();
+        LogoScene.pStateLogIn.DoLogin();
     }
 }

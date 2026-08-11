@@ -228,13 +228,12 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
             }
         }
 
-        var panelHandle = Timing.RunCoroutine(LoadAssets_Panel());
-        var tableHandle = Timing.RunCoroutine(LoadAssets_Tables());
-        var spriteHandle = Timing.RunCoroutine(LoadAssets_Sprites());
-
-        yield return Timing.WaitUntilDone(panelHandle);
-        yield return Timing.WaitUntilDone(tableHandle);
-        yield return Timing.WaitUntilDone(spriteHandle);
+        // MEC invalidates a CoroutineHandle as soon as its coroutine finishes.
+        // Starting all three first allowed a later coroutine to finish while an
+        // earlier handle was being awaited, making WaitUntilDone assert.
+        yield return Timing.WaitUntilDone(Timing.RunCoroutine(LoadAssets_Panel()));
+        yield return Timing.WaitUntilDone(Timing.RunCoroutine(LoadAssets_Tables()));
+        yield return Timing.WaitUntilDone(Timing.RunCoroutine(LoadAssets_Sprites()));
 
         pIsInit = true;
     }

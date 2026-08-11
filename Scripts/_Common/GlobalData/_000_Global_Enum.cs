@@ -40,7 +40,7 @@ public enum EPanelType
     Characters,
     Gacha,
     Formation,
-    Storage,
+    Inventory,
     Shop,
     Mail,
     LobbyCharacter,

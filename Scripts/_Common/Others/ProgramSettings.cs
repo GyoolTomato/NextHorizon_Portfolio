@@ -24,9 +24,12 @@ class ProgramSettings : ScriptableObject
 
     //
     [SerializeField] private string ServerAddress;
+    [SerializeField] private string DeviceUID;
+    //[SerializeField] private bool IsLocalTestMode;
 
     //
     public string pServerAddress => ServerAddress;
+    //public bool pIsLocalTestMode => IsLocalTestMode;
 
 
     /// <summary>
@@ -35,5 +38,19 @@ class ProgramSettings : ScriptableObject
     ProgramSettings()
     {
 
+    }
+
+    public string GetLocalUserId()
+    {
+#if UNITY_EDITOR
+        if (!string.IsNullOrWhiteSpace(DeviceUID))
+        {
+            return DeviceUID.Trim();
+        }
+
+        return $"editor-{SystemInfo.deviceUniqueIdentifier}";
+#else
+        return SystemInfo.deviceUniqueIdentifier;
+#endif
     }
 }

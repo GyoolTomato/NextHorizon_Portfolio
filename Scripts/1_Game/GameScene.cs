@@ -36,6 +36,7 @@ public static class GameScene
         GameData.Instance               .Init();
         GameData.Instance.pDataCharacter.Init();
         GameData.Instance.pDataGacha    .Init();
+        GameData.Instance.pDataInventory.Init();
         GameData.Instance.pDataMissions .Init();
         GameData.Instance.pDataShop     .Init();
 

@@ -1,52 +1,39 @@
-using Data;
 using Firebase.Auth;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+using Observer;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Networking;
-using MEC;
-using System.Text;
 
-public class LogoState_LogIn : LogoState
+public class LogoState_LogIn : LogoState,
+    IObserver<LoginSucceededEvent>,
+    IObserver<NewUserRequiredEvent>,
+    IObserver<ServerRequestFailedEvent>
 {
-    //
-    StringBuilder _sb = new StringBuilder();
-
-    //
     public LogoState_LogIn(ELogoState state) : base(state)
     {
-        
     }
 
-    //
-    override public void Enter()
+    public override void Enter()
     {
-        //
-        _sb ??= new StringBuilder();
+        ObserverTracker<LoginSucceededEvent>.Instance.Subscribe(this);
+        ObserverTracker<NewUserRequiredEvent>.Instance.Subscribe(this);
+        ObserverTracker<ServerRequestFailedEvent>.Instance.Subscribe(this);
 
-        //
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
         panel.Init();
     }
 
-    //
-    override public void Exit()
+    public override void Exit()
     {
-
+        ObserverTracker<LoginSucceededEvent>.Instance.Unsubscribe(this);
+        ObserverTracker<NewUserRequiredEvent>.Instance.Unsubscribe(this);
+        ObserverTracker<ServerRequestFailedEvent>.Instance.Unsubscribe(this);
     }
 
-    //
-    override public void Update()
+    public override void Update()
     {
-        
     }
 
-    //
-    public void DoLoadUserData()
+    public void DoLogin()
     {
-        //
         if (FirebaseAuth.DefaultInstance == null)
         {
             Debug.LogError("FirebaseAuth.DefaultInstance is null");
@@ -55,51 +42,95 @@ public class LogoState_LogIn : LogoState
 
         if (FirebaseAuth.DefaultInstance.CurrentUser == null)
         {
-            Debug.LogError("CurrentUser is null. 아직 로그인 정보가 준비되지 않음");
+            Debug.LogError("Firebase current user is not ready.");
             return;
         }
 
-        //          
-        var uid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        string localId = ProgramSettings.Instance.GetLocalUserId();
+        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
 
-        //
-        Timing.RunCoroutine(CoLoadUserData(uid));
+        if (string.IsNullOrWhiteSpace(localId))
+        {
+            Debug.LogError("Local user ID is empty.");
+            return;
+        }
+
+        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
+        panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
+
+        ServerAPI.Instance.Send_Login(
+            localId,
+            firebaseUid,
+            response =>
+            {
+                if (response.isNew)
+                {
+                    ObserverTracker<NewUserRequiredEvent>.Instance.Broadcast(
+                        new NewUserRequiredEvent(localId, firebaseUid));
+                    return;
+                }
+
+                ObserverTracker<LoginSucceededEvent>.Instance.Broadcast(
+                    new LoginSucceededEvent(response.user));
+            },
+            error => ObserverTracker<ServerRequestFailedEvent>.Instance.Broadcast(
+                new ServerRequestFailedEvent(error)));
     }
 
-    IEnumerator<float> CoLoadUserData(string uid)
+    public void OnEvent(LoginSucceededEvent message)
     {
-        //
-        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
-
-        //
-        string url = $"{ProgramSettings.Instance.pServerAddress}/user?uid={uid}";
-        
-        using (UnityWebRequest req = UnityWebRequest.Get(url))
+        ServerUserData user = message.User;
+        UserData data = new UserData
         {
-            req.SendWebRequest();
-            panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
+            id = user.id,
+            localId = user.localId,
+            firebaseUid = user.firebaseUid,
+            nickname = user.nickname,
+            level = user.level
+        };
 
-            while (req.isDone == false)
-            {
-                yield return Timing.WaitForOneFrame;
-            }
+        GlobalData.Instance.pDataPlayerInfo.Init(data);
+        GameManager.ChangeGameScene();
+    }
 
-            if (req.result != UnityWebRequest.Result.Success)
-            {
-                Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextSystem(9990005), Manager_UI.Instance.GetTextSystem(9990006), Panel_MessageBox.EType.OK, ()=>
-                {
-                    panel.pComLogin.SetState(panel.pComLogin.GetCurrentLogInType());
-                });
-                Debug.LogError("유저 데이터 요청 실패: " + req.error);                
-                yield break;
-            }
+    public void OnEvent(NewUserRequiredEvent message)
+    {
+        Debug.Log($"신규 사용자 계정을 생성합니다: {message.LocalId}");
 
-            string json = req.downloadHandler.text;
-            Debug.Log("응답 JSON: " + json);
+#if UNITY_EDITOR
+        // 닉네임 입력 UI가 연결되기 전까지 에디터의 로컬 ID를 초기 닉네임으로 사용한다.
+        CreateNewUser(message.LocalId, message.FirebaseUid, message.LocalId);
+#else
+        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
+        panel.pComLogin.SetState(panel.pComLogin.GetCurrentLogInType());
+        Debug.Log("신규 사용자 닉네임 입력이 필요합니다.");
+#endif
+    }
 
-            UserData data = JsonUtility.FromJson<UserData>(json);
-            GlobalData.Instance.pDataPlayerInfo.Init(data);
-            GameManager.ChangeGameScene();
-        }
+    public void CreateNewUser(string localId, string firebaseUid, string nickname)
+    {
+        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
+        panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
+
+        ServerAPI.Instance.Send_CreateUser(
+            localId,
+            firebaseUid,
+            nickname,
+            user => ObserverTracker<LoginSucceededEvent>.Instance.Broadcast(
+                new LoginSucceededEvent(user)),
+            error => ObserverTracker<ServerRequestFailedEvent>.Instance.Broadcast(
+                new ServerRequestFailedEvent(error)));
+    }
+
+    public void OnEvent(ServerRequestFailedEvent message)
+    {
+        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
+        Manager_UI.Instance.ShowMessageBox(
+            Manager_UI.Instance.GetTextSystem(9990005),
+            Manager_UI.Instance.GetTextSystem(9990006),
+            Panel_MessageBox.EType.OK,
+            () => panel.pComLogin.SetState(panel.pComLogin.GetCurrentLogInType()));
+
+        Debug.LogError($"User API request failed: {message.Error}");
     }
 }
