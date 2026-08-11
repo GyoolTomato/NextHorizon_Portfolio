@@ -96,15 +96,24 @@ public class LogoState_LogIn : LogoState,
     public void OnEvent(NewUserRequiredEvent message)
     {
         Debug.Log($"신규 사용자 계정을 생성합니다: {message.LocalId}");
+        CreateNewUser(
+            message.LocalId,
+            message.FirebaseUid,
+            CreateInitialNickname(message.LocalId));
+    }
 
-#if UNITY_EDITOR
-        // 닉네임 입력 UI가 연결되기 전까지 에디터의 로컬 ID를 초기 닉네임으로 사용한다.
-        CreateNewUser(message.LocalId, message.FirebaseUid, message.LocalId);
-#else
-        var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
-        panel.pComLogin.SetState(panel.pComLogin.GetCurrentLogInType());
-        Debug.Log("신규 사용자 닉네임 입력이 필요합니다.");
-#endif
+    private string CreateInitialNickname(string localId)
+    {
+        if (!string.IsNullOrWhiteSpace(localId) && localId.Length <= 16)
+        {
+            return localId;
+        }
+
+        string idPart = string.IsNullOrWhiteSpace(localId)
+            ? System.Guid.NewGuid().ToString("N").Substring(0, 8)
+            : localId.Substring(0, 8);
+
+        return $"User{idPart}";
     }
 
     public void CreateNewUser(string localId, string firebaseUid, string nickname)

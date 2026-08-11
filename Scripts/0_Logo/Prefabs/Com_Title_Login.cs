@@ -9,6 +9,9 @@ using UnityEngine.UI;
 
 public class Com_Title_Login : Com_Base
 {
+    private const string GoogleWebClientId =
+        "693264845451-4019fn8u077jb0nl7jrq0t69ju7cbmnj.apps.googleusercontent.com";
+
     //
     [SerializeField] GameObject _btnLogInGoogle;
     [SerializeField] GameObject _btnLogInGuest;
@@ -30,6 +33,7 @@ public class Com_Title_Login : Com_Base
     EState               _state = EState.None;
     private FirebaseAuth _auth;
     private bool         _isInitialized = false;
+    private GoogleSignInConfiguration _googleSignInConfiguration;
 
     /// <summary>
     /// 
@@ -37,6 +41,9 @@ public class Com_Title_Login : Com_Base
     public void Init()
     {
         Debug.Log("Init start");
+
+        _isInitialized = false;
+        EnsureGoogleSignInConfiguration();
 
         _btnLogInGoogle.SetActive(false);
         _btnLogInGuest.SetActive(false);
@@ -55,13 +62,6 @@ public class Com_Title_Login : Com_Base
 
             FirebaseApp app = FirebaseApp.DefaultInstance;
             _auth = FirebaseAuth.DefaultInstance;
-
-            GoogleSignIn.Configuration = new GoogleSignInConfiguration
-            {
-                WebClientId = "693264845451-4019fn8u077jb0nl7jrq0t69ju7cbmnj.apps.googleusercontent.com",
-                RequestIdToken = true,
-                RequestEmail = true
-            };
 
             _isInitialized = true;
 
@@ -152,14 +152,9 @@ public class Com_Title_Login : Com_Base
             return;
         }
 
-        if (GoogleSignIn.Configuration == null)
-        {
-            Debug.LogError("GoogleSignIn.Configuration is null");
-            return;
-        }
-
         try
         {
+            EnsureGoogleSignInConfiguration();
             GoogleSignIn.DefaultInstance.SignIn()
                 .ContinueWithOnMainThread(OnGoogleAuthFinished);
         }
@@ -168,6 +163,18 @@ public class Com_Title_Login : Com_Base
             Debug.LogException(exception);
         }
 #endif
+    }
+
+    private void EnsureGoogleSignInConfiguration()
+    {
+        _googleSignInConfiguration ??= new GoogleSignInConfiguration
+        {
+            WebClientId = GoogleWebClientId,
+            RequestIdToken = true,
+            RequestEmail = true
+        };
+
+        GoogleSignIn.Configuration = _googleSignInConfiguration;
     }
 
     /// <summary>
