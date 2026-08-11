@@ -2,7 +2,7 @@
 
 Unity로 개발한 모바일 수집형 RPG 프로젝트입니다.
 
-[📱 Android APK 다운로드 (v0.0.1)](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v0.0.1)
+[📱 Android APK 다운로드 (v0.0.3)](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v0.0.3)
 
 라이브 서비스형 게임의 클라이언트 구조를 경험하기 위해 인증, 원격 리소스 관리, 데이터 테이블, 다국어 UI와 캐릭터 정보 화면을 구현했습니다.
 
