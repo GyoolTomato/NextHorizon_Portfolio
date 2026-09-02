@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameData : Singleton<GameData>
 {
     //
+    public GameData_PlayerInfo pPlayerInfo   { private set; get; } = null;
     public GameData_Character pDataCharacter { private set; get; } = null;
     public GameData_Gacha     pDataGacha     { private set; get; } = null;
     public GameData_Inventory pDataInventory { private set; get; } = null;
@@ -15,6 +16,7 @@ public class GameData : Singleton<GameData>
     public void Init()
     {
         //
+        pPlayerInfo    = new GameData_PlayerInfo();
         pDataCharacter = new GameData_Character();
         pDataGacha     = new GameData_Gacha    ();
         pDataInventory = new GameData_Inventory();

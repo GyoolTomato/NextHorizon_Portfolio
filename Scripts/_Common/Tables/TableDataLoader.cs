@@ -37,6 +37,10 @@ namespace Data
         public List<_904_ItemsText.Values> _list_904_ItemsText = new List<_904_ItemsText.Values>();
         public Dictionary<int, _905_SkillsText.Values> _dic_905_SkillsText = new Dictionary<int, _905_SkillsText.Values>();
         public List<_905_SkillsText.Values> _list_905_SkillsText = new List<_905_SkillsText.Values>();
+        public Dictionary<int, _906_ArmorsText.Values> _dic_906_ArmorsText = new Dictionary<int, _906_ArmorsText.Values>();
+        public List<_906_ArmorsText.Values> _list_906_ArmorsText = new List<_906_ArmorsText.Values>();
+        public Dictionary<int, _907_WeaponsText.Values> _dic_907_WeaponsText = new Dictionary<int, _907_WeaponsText.Values>();
+        public List<_907_WeaponsText.Values> _list_907_WeaponsText = new List<_907_WeaponsText.Values>();
         public Dictionary<int, _999_SystemText.Values> _dic_999_SystemText = new Dictionary<int, _999_SystemText.Values>();
         public List<_999_SystemText.Values> _list_999_SystemText = new List<_999_SystemText.Values>();
 
@@ -132,6 +136,18 @@ namespace Data
             {
                 _list_905_SkillsText.Add(item);
                 _dic_905_SkillsText.Add(item.key, item);
+            }
+            var temp_906_ArmorsText = JsonConvert.DeserializeObject<List<_906_ArmorsText.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_906_ArmorsText.bytes").text);
+            foreach (var item in temp_906_ArmorsText)
+            {
+                _list_906_ArmorsText.Add(item);
+                _dic_906_ArmorsText.Add(item.key, item);
+            }
+            var temp_907_WeaponsText = JsonConvert.DeserializeObject<List<_907_WeaponsText.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_907_WeaponsText.bytes").text);
+            foreach (var item in temp_907_WeaponsText)
+            {
+                _list_907_WeaponsText.Add(item);
+                _dic_907_WeaponsText.Add(item.key, item);
             }
         }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class Com_Slots<T> : Com_Base where T : Com_Base
+public abstract class Com_Slots<T> : Com_Base where T : Com_Base
 {
     //
     [SerializeField] ScrollView    _scrollView = null;
@@ -47,7 +47,7 @@ public class Com_Slots<T> : Com_Base where T : Com_Base
     /// <summary>
     /// 
     /// </summary>
-    void DeactiveSlot(T slot)
+    public void DeactiveSlot(T slot)
     {
         //
         _slotPool.Push(slot);

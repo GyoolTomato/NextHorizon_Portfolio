@@ -35,8 +35,10 @@ public class Com_Missions_Slot : Com_Slots<Com_Item_Slot>
             var item = _101_Items.GetItem(_data.pTableInfo.rewardKeys[i]);
             if (item != null)
             {
+                var temp = new DataItem(_data.pTableInfo.rewardCounts[i], item);
+
                 var slot = ActivateSlot();
-                slot.Init(item, _data.pTableInfo.rewardCounts[i]);
+                slot.Init(temp, EItemValueType.Name);
             }
         }
 

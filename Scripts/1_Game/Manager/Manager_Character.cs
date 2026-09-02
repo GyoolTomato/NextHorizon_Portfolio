@@ -127,6 +127,73 @@ public class Manager_Character : Singleton<Manager_Character>
     /// <summary>
     /// 
     /// </summary>
+    /// <returns></returns>
+    public void GetExpectLevel(int level, long exp, EItemType[] items, long[] amount, out _107_CharacterLevel.Values resultTableInfo, out long cardExp, out long remainExp)
+    {
+        //
+        resultTableInfo = null;
+        cardExp = 0;
+        remainExp = 0;
+
+        //
+        if (items.Length != amount.Length)
+        {
+            Debug.LogError("items.Length != amount.Length");
+            return;
+        }
+
+        //
+        for (int i = 0; i < items.Length; i++)
+        {
+            var expCardValue = 0L;
+            switch (items[i])
+            {
+                case EItemType.ExpCard:
+                    var cardTableInfo = _100_CommonValues.GetItem(1000002);
+                    if (cardTableInfo == null)
+                    {
+                        continue;
+                    }
+                    expCardValue = Convert.ToInt64(cardTableInfo.value) * amount[i];
+                    break;
+            }
+
+            cardExp += expCardValue;
+        }
+        var tableInfo = Manager_Table.Instance.GetCharacterLevelInfo(level);
+        if (tableInfo == null)
+        {
+            Debug.LogError("Manager_Table.Instance.GetCharacterLevelInfo(level) == Null");
+
+            return;
+        }
+
+        var tempExpRequired = exp + cardExp;
+        for (int i = tableInfo.level - 1; i < _107_CharacterLevel.GetList().Count; i++)
+        {
+            var tempTotalExpRequired = _107_CharacterLevel.GetList()[i];
+            if (tempTotalExpRequired.expToNextLevel <= tempExpRequired)
+            {
+                tempExpRequired -= tempTotalExpRequired.expToNextLevel;
+            }
+            else
+            {
+                resultTableInfo = tempTotalExpRequired;
+                remainExp = tempExpRequired;
+                break;
+            }
+        }
+
+        if (resultTableInfo == null && _107_CharacterLevel.GetList().Count > 0)
+        {
+            resultTableInfo = _107_CharacterLevel.GetList()[_107_CharacterLevel.GetList().Count - 1];
+            remainExp = 0;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="studentId"></param>
     /// <param name="exp"></param>
     /// <returns></returns>
@@ -210,5 +277,16 @@ public class Manager_Character : Singleton<Manager_Character>
 
         //
         return true;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public bool IsMaxLevel(int level)
+    {
+        var maxLevel = _100_CommonValues.GetItem(1000001).value;
+
+        return level >= maxLevel;
     }
 }

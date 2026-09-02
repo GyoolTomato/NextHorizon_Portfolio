@@ -15,8 +15,6 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
-
-        GlobalData.Instance.Init();
     }
 
     /// <summary>

@@ -1,11 +1,12 @@
+using Data;
+using MEC;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.AddressableAssets;
-using MEC;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
 
 public class LogoState_Download : LogoState
 {
@@ -52,6 +53,8 @@ public class LogoState_Download : LogoState
         if (_isDone == false && Manager_Addressable.Instance.pIsInit)
         {
             _isDone = true;
+
+            TableDataLoader.Instance.Init();
 
             LogoScene.ChangeState(ELogoState.LogIn);
         }

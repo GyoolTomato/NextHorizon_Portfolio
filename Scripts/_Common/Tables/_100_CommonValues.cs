@@ -11,7 +11,7 @@ public class _100_CommonValues
         public double value { private set; get; }
 
         [JsonConstructor]
-        public Values(int key, double value)
+        public Values(int key,double value)
         {
             this.key = key;
             this.value = value;

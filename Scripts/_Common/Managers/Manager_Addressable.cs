@@ -54,7 +54,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         {
             Addressables.Release(handleInit);
 
-            Debug.LogError("Addressables Init Valid Failed");
+            Debug.LogError($"Addressables 초기화 핸들이 유효하지 않음. 상태: {handleInit.Status}, 오류: {handleInit.OperationException}");
 
             yield break;
         }
@@ -62,7 +62,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         {
             Addressables.Release(handleInit);
 
-            Debug.LogError("Addressables Init Failed");
+            Debug.LogError($"Addressables 초기화 실패. 상태: {handleInit.Status}, 오류: {handleInit.OperationException}");
 
             yield break;
         }
@@ -79,7 +79,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         {
             Addressables.Release(handleCheck);
 
-            Debug.LogError("Addressables Check Catalogs Valid Failed");
+            Debug.LogError($"Addressables 카탈로그 확인 핸들이 유효하지 않음. 상태: {handleCheck.Status}, 오류: {handleCheck.OperationException}");
 
             yield break;
         }
@@ -87,7 +87,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         {
             Addressables.Release(handleCheck);
 
-            Debug.LogError("Addressables Check Catalogs Failed");
+            Debug.LogError($"Addressables 카탈로그 확인 실패. 상태: {handleCheck.Status}, 오류: {handleCheck.OperationException}");
 
             yield break;
         }
@@ -105,7 +105,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                 Addressables.Release(handleUpdate);
                 Addressables.Release(handleCheck);
 
-                Debug.LogError("Addressables Update Catalogs Valid Failed");
+                Debug.LogError($"Addressables 카탈로그 업데이트 핸들이 유효하지 않음. 상태: {handleUpdate.Status}, 오류: {handleUpdate.OperationException}");
 
                 yield break;
             }
@@ -114,7 +114,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                 Addressables.Release(handleUpdate);
                 Addressables.Release(handleCheck);
 
-                Debug.LogError("Addressables Update Catalogs Failed");
+                Debug.LogError($"Addressables 카탈로그 업데이트 실패. 상태: {handleUpdate.Status}, 오류: {handleUpdate.OperationException}");
 
                 yield break;
             }
@@ -132,13 +132,13 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         }
         if (handleLoc.IsValid() == false)
         {
-            Debug.LogError("Addressables Resource Location Valid Failed");
+            Debug.LogError($"Addressables 리소스 위치 핸들이 유효하지 않음. 상태: {handleLoc.Status}, 오류: {handleLoc.OperationException}");
 
             yield break;
         }
         if (handleLoc.Status != AsyncOperationStatus.Succeeded)
         {
-            Debug.LogError("Addressables Resource Location Failed");
+            Debug.LogError($"Addressables 리소스 위치 조회 실패. 상태: {handleLoc.Status}, 오류: {handleLoc.OperationException}");
 
             yield break;
         }
@@ -156,13 +156,13 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         }
         if (handleSize.IsValid() == false)
         {
-            Debug.LogError("Addressables Download Size Valid Failed");
+            Debug.LogError($"Addressables 다운로드 용량 핸들이 유효하지 않음. 상태: {handleSize.Status}, 오류: {handleSize.OperationException}");
 
             yield break;
         }
         if (handleSize.Status != AsyncOperationStatus.Succeeded)
         {
-            Debug.LogError("Addressables Download Size Failed");
+            Debug.LogError($"Addressables 다운로드 용량 조회 실패. 상태: {handleSize.Status}, 오류: {handleSize.OperationException}");
 
             yield break;
         }
@@ -209,13 +209,13 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                 }
                 if (handleDownload.IsValid() == false)
                 {
-                    Debug.LogError("Addressables Download Valid Failed");
+                    Debug.LogError($"Addressables 다운로드 핸들이 유효하지 않음. 상태: {handleDownload.Status}, 오류: {handleDownload.OperationException}");
 
                     yield break;
                 }
                 if (handleDownload.Status != AsyncOperationStatus.Succeeded)
                 {
-                    Debug.LogError("Addressables Download Failed");
+                    Debug.LogError($"Addressables 에셋 다운로드 실패. 상태: {handleDownload.Status}, 오류: {handleDownload.OperationException}");
 
                     yield break;
                 }
@@ -237,6 +237,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
 
         pIsInit = true;
     }
+
 
     /// <summary>
     /// 
@@ -290,7 +291,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
             //
             if (item.handle.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.LogError($"Addressables Load Resource_Panel Failed. Key : {item.key}");
+                Debug.LogError($"Addressables 패널 에셋 로드 실패. Key: {item.key}, 상태: {item.handle.Status}, 오류: {item.handle.OperationException}");
 
                 //
                 foreach (var item2 in loadList)
@@ -396,7 +397,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                         //
                         if (item.handle.Status != AsyncOperationStatus.Succeeded)
                         {
-                            Debug.LogError($"Addressables Load Resource_Table Failed. Key : {item.key}");
+                            Debug.LogError($"Addressables 테이블 에셋 로드 실패. Key: {item.key}, 상태: {item.handle.Status}, 오류: {item.handle.OperationException}");
 
                             //
                             foreach (var item2 in loadList)
@@ -430,7 +431,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                 {
                     Addressables.Release(handle);
 
-                    Debug.LogError("Addressables Load Resource_Table Failed");
+                    Debug.LogError($"Addressables 테이블 리소스 위치 조회 실패. 상태: {handle.Status}, 오류: {handle.OperationException}");
 
                     yield break;
                 }
@@ -500,7 +501,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                         //
                         if (item.handle.Status != AsyncOperationStatus.Succeeded)
                         {
-                            Debug.LogError($"Addressables Load Resource_Sprite Failed. Key : {item.key}");
+                            Debug.LogError($"Addressables 스프라이트 에셋 로드 실패. Key: {item.key}, 상태: {item.handle.Status}, 오류: {item.handle.OperationException}");
 
                             //
                             foreach (var item2 in loadList)
@@ -534,7 +535,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
                 {
                     Addressables.Release(handle);
 
-                    Debug.LogError("Addressables Load Resource_Sprites Failed");
+                    Debug.LogError($"Addressables 스프라이트 리소스 위치 조회 실패. 상태: {handle.Status}, 오류: {handle.OperationException}");
                     
                     yield break;
                 }
@@ -543,6 +544,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         //
         Addressables.Release(handle);
     }
+
 
     /// <summary>
     /// 

@@ -155,6 +155,8 @@ public class Com_Title_Login : Com_Base
         try
         {
             EnsureGoogleSignInConfiguration();
+            GoogleSignIn.DefaultInstance.EnableDebugLogging(true);
+            Debug.Log($"Google Sign-In start: package={Application.identifier}, webClientId={GoogleSignIn.Configuration.WebClientId}");
             GoogleSignIn.DefaultInstance.SignIn()
                 .ContinueWithOnMainThread(OnGoogleAuthFinished);
         }
@@ -191,7 +193,17 @@ public class Com_Title_Login : Com_Base
 
         if (task.IsFaulted)
         {
-            Debug.LogError($"Google Sign-In error: {task.Exception}");
+            System.Exception innerException = task.Exception?.GetBaseException();
+            if (innerException is GoogleSignIn.SignInException signInException)
+            {
+                Debug.LogError(
+                    $"Google Sign-In error: status={signInException.Status}, " +
+                    $"message={signInException.Message}");
+            }
+            else
+            {
+                Debug.LogError($"Google Sign-In error: {task.Exception}");
+            }
             return;
         }
 

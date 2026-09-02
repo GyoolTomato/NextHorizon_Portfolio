@@ -52,6 +52,7 @@ public enum EPanelType
     PopUpInfo,
     Settings,
     MessageBox,
+    Flash,
     Group_0,
     Group_1,
     Group_2,
@@ -167,5 +168,14 @@ public enum EMissionType
     GetIt_ExpCard,
     TimeOver,
     WorkCount,
+    End
+}
+
+public enum EItemValueType
+{
+    None,
+    Name,
+    Grade,
+    Level,
     End
 }

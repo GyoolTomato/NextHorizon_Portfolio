@@ -1,21 +1,22 @@
 using Firebase.Auth;
-using Observer;
 using UnityEngine;
 
 public class LogoState_LogIn : LogoState,
-    IObserver<LoginSucceededEvent>,
-    IObserver<NewUserRequiredEvent>,
-    IObserver<ServerRequestFailedEvent>
+    Observer.IObserver<Observer.LoginSucceededEvent>,
+    Observer.IObserver<Observer.LoginResponseParsedEvent>,
+    Observer.IObserver<Observer.NewUserRequiredEvent>
 {
+    private string _loginLocalId;
+    private string _loginFirebaseUid;
     public LogoState_LogIn(ELogoState state) : base(state)
     {
     }
 
     public override void Enter()
     {
-        ObserverTracker<LoginSucceededEvent>.Instance.Subscribe(this);
-        ObserverTracker<NewUserRequiredEvent>.Instance.Subscribe(this);
-        ObserverTracker<ServerRequestFailedEvent>.Instance.Subscribe(this);
+        Observer.ObserverTracker<Observer.LoginSucceededEvent>.Instance.Subscribe(this);
+        Observer.ObserverTracker<Observer.LoginResponseParsedEvent>.Instance.Subscribe(this);
+        Observer.ObserverTracker<Observer.NewUserRequiredEvent>.Instance.Subscribe(this);
 
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
         panel.Init();
@@ -23,9 +24,9 @@ public class LogoState_LogIn : LogoState,
 
     public override void Exit()
     {
-        ObserverTracker<LoginSucceededEvent>.Instance.Unsubscribe(this);
-        ObserverTracker<NewUserRequiredEvent>.Instance.Unsubscribe(this);
-        ObserverTracker<ServerRequestFailedEvent>.Instance.Unsubscribe(this);
+        Observer.ObserverTracker<Observer.LoginSucceededEvent>.Instance.Unsubscribe(this);
+        Observer.ObserverTracker<Observer.LoginResponseParsedEvent>.Instance.Unsubscribe(this);
+        Observer.ObserverTracker<Observer.NewUserRequiredEvent>.Instance.Unsubscribe(this);
     }
 
     public override void Update()
@@ -48,6 +49,8 @@ public class LogoState_LogIn : LogoState,
 
         string localId = ProgramSettings.Instance.GetLocalUserId();
         string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
+        _loginLocalId = localId;
+        _loginFirebaseUid = firebaseUid;
 
         if (string.IsNullOrWhiteSpace(localId))
         {
@@ -61,25 +64,18 @@ public class LogoState_LogIn : LogoState,
         ServerAPI.Instance.Send_Login(
             localId,
             firebaseUid,
-            response =>
+            success =>
             {
-                if (response.isNew)
-                {
-                    ObserverTracker<NewUserRequiredEvent>.Instance.Broadcast(
-                        new NewUserRequiredEvent(localId, firebaseUid));
-                    return;
-                }
-
-                ObserverTracker<LoginSucceededEvent>.Instance.Broadcast(
-                    new LoginSucceededEvent(response.user));
+                // 로그인 응답 파싱과 후속 처리는 옵저버 이벤트에서 수행한다.
             },
-            error => ObserverTracker<ServerRequestFailedEvent>.Instance.Broadcast(
-                new ServerRequestFailedEvent(error)));
+            HandleRequestFailure);
     }
 
-    public void OnEvent(LoginSucceededEvent message)
+    public void OnEvent(Observer.LoginSucceededEvent message)
     {
+        //
         ServerUserData user = message.User;
+        Debug.Log($"로그인 성공: userId={user.id}, items={user.items?.Length ?? 0}, characters={user.characters?.Length ?? 0}");
         UserData data = new UserData
         {
             id = user.id,
@@ -89,11 +85,17 @@ public class LogoState_LogIn : LogoState,
             level = user.level
         };
 
-        GlobalData.Instance.pDataPlayerInfo.Init(data);
+        //
+        GameData.Instance.Init();
+        GameData.Instance.pPlayerInfo.Init(data);
+        GameData.Instance.pDataInventory.Init(user.items, user.armors, user.weapons);
+        GameData.Instance.pDataCharacter.Init(user.characters);
+
+        //
         GameManager.ChangeGameScene();
     }
 
-    public void OnEvent(NewUserRequiredEvent message)
+    public void OnEvent(Observer.NewUserRequiredEvent message)
     {
         Debug.Log($"신규 사용자 계정을 생성합니다: {message.LocalId}");
         CreateNewUser(
@@ -125,13 +127,24 @@ public class LogoState_LogIn : LogoState,
             localId,
             firebaseUid,
             nickname,
-            user => ObserverTracker<LoginSucceededEvent>.Instance.Broadcast(
-                new LoginSucceededEvent(user)),
-            error => ObserverTracker<ServerRequestFailedEvent>.Instance.Broadcast(
-                new ServerRequestFailedEvent(error)));
+            success => { },
+            HandleRequestFailure);
     }
 
-    public void OnEvent(ServerRequestFailedEvent message)
+    public void OnEvent(Observer.LoginResponseParsedEvent message)
+    {
+        if (message.Response.isNew)
+        {
+            Observer.ObserverTracker<Observer.NewUserRequiredEvent>.Instance.Broadcast(
+                new Observer.NewUserRequiredEvent(_loginLocalId, _loginFirebaseUid));
+            return;
+        }
+
+        Observer.ObserverTracker<Observer.LoginSucceededEvent>.Instance.Broadcast(
+            new Observer.LoginSucceededEvent(message.Response.user));
+    }
+
+    private void HandleRequestFailure(ServerAPIError error)
     {
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
         Manager_UI.Instance.ShowMessageBox(
@@ -140,6 +153,6 @@ public class LogoState_LogIn : LogoState,
             Panel_MessageBox.EType.OK,
             () => panel.pComLogin.SetState(panel.pComLogin.GetCurrentLogInType()));
 
-        Debug.LogError($"User API request failed: {message.Error}");
+        Debug.LogError($"User API request failed: status={error.statusCode}, message={error.message}");
     }
 }

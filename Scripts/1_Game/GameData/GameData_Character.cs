@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameData_Character
@@ -12,17 +13,32 @@ public class GameData_Character
     /// <summary>
     /// 
     /// </summary>
-    public void Init()
+    public void Init(ServerPlayerCharacterData[] characters)
     {
+        characters = characters.OrderBy(x => x.characterKey).ToArray();
+
         pCharacters ??= new List<Character>();
         pDicCharacters ??= new Dictionary<int, Character>();
 
         pCharacters.Clear();
         pDicCharacters.Clear();
 
+        var indexServerData = 0;
         foreach (var item in _102_Character.GetList())
         {
             var temp = new Character(item);
+
+            var serverData = characters[indexServerData];
+            if (temp.pTableInfo.key == serverData.characterKey)
+            {
+                temp.pIsActive = true;
+                temp.pGrade = 0;
+                temp.pStack = serverData.stack;
+                temp.pLevel = serverData.level;
+                temp.pExp = serverData.exp;
+                temp.pActiveLv = 0;
+                temp.pCharm = 0;                
+            }
 
             pCharacters.Add(temp);
             pDicCharacters.Add(item.key, temp);

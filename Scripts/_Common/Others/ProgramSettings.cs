@@ -23,12 +23,26 @@ class ProgramSettings : ScriptableObject
     }
 
     //
-    [SerializeField] private string ServerAddress;
+    [SerializeField] private bool IsTestServer;
+    [SerializeField] private string TestServerAddress;
+    [SerializeField] private string[] ServerAddress;
     [SerializeField] private string DeviceUID;
     //[SerializeField] private bool IsLocalTestMode;
 
     //
-    public string pServerAddress => ServerAddress;
+    public string[] pServerAddresses
+    {
+        get
+        {
+#if UNITY_EDITOR
+            if (IsTestServer && !string.IsNullOrWhiteSpace(TestServerAddress))
+            {
+                return new[] { TestServerAddress };
+            }
+#endif
+            return ServerAddress;
+        }
+    }
     //public bool pIsLocalTestMode => IsLocalTestMode;
 
 
@@ -52,5 +66,16 @@ class ProgramSettings : ScriptableObject
 #else
         return SystemInfo.deviceUniqueIdentifier;
 #endif
+    }
+
+    public string GetServerAddress(int index)
+    {
+        string[] addresses = pServerAddresses;
+        if (addresses == null || index < 0 || index >= addresses.Length)
+        {
+            return string.Empty;
+        }
+
+        return (addresses[index] ?? string.Empty).Trim().TrimEnd('/');
     }
 }

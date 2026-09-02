@@ -56,9 +56,10 @@ namespace Observer
                 {
                     item.OnEvent(msg);
                 }
-                catch
+                catch (System.Exception exception)
                 {
-                    Debug.LogError("Observer Broadcast Error : " + item.GetType().Name);
+                    Debug.LogError($"Observer Broadcast Error : {item.GetType().Name} ({typeof(T).Name})");
+                    Debug.LogException(exception);
                 }
             }
         }

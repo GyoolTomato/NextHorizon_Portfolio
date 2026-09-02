@@ -10,16 +10,18 @@ public class _105_Armors
         public int key { private set; get; }
         public EGrade grade { private set; get; }
         public int name { private set; get; }
+        public int desc { private set; get; }
         public string icon { private set; get; }
         public EArmorType type { private set; get; }
         public int value { private set; get; }
 
         [JsonConstructor]
-        public Values(int key,EGrade grade,int name,string icon,EArmorType type,int value)
+        public Values(int key,EGrade grade,int name,int desc,string icon,EArmorType type,int value)
         {
             this.key = key;
             this.grade = grade;
             this.name = name;
+            this.desc = desc;
             this.icon = icon;
             this.type = type;
             this.value = value;

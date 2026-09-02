@@ -314,9 +314,47 @@ public class Manager_UI : Singleton<Manager_UI>
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public string GetTextItems(int key)
+    public string GetTextItem(int key)
     {
         var temp = _904_ItemsText.GetItem(key);
+        if (temp == null)
+            return string.Empty;
+
+        switch (_language)
+        {
+            case ELanguage.Korean: return temp.korean;
+            case ELanguage.Japanese: return temp.japanese;
+            default: return temp.english;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public string GetTextArmor(int key)
+    {
+        var temp = _906_ArmorsText.GetItem(key);
+        if (temp == null)
+            return string.Empty;
+
+        switch (_language)
+        {
+            case ELanguage.Korean: return temp.korean;
+            case ELanguage.Japanese: return temp.japanese;
+            default: return temp.english;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public string GetTextWeapon(int key)
+    {
+        var temp = _907_WeaponsText.GetItem(key);
         if (temp == null)
             return string.Empty;
 
@@ -449,5 +487,15 @@ public class Manager_UI : Singleton<Manager_UI>
     {
         var panel = ShowPanel(EPanelType.MessageBox) as Panel_MessageBox;
         panel.Init(title, message, type, onConfirm, onCancel);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void ShowFlash(Action onComplete = null)
+    {
+        var panel = ShowPanel(EPanelType.Flash) as Panel_Flash;
+        panel.Init();
+        panel.Show(onComplete);
     }
 }

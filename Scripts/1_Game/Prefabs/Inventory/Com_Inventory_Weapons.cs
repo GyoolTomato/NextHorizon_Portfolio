@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Com_Inventory_Weapons : Com_Slots<Com_Item_Slot>
+public class Com_Inventory_Weapons : Com_Slots<Com_Weapon_Slot>
 {
     /// <summary>
     /// 
@@ -16,14 +16,8 @@ public class Com_Inventory_Weapons : Com_Slots<Com_Item_Slot>
         foreach (var item in GameData.Instance.pDataInventory.pDicWeapons)
         {
             //
-            if (item.Value.pCount == 0)
-            {
-                continue;
-            }
-
-            //
             var slot = ActivateSlot();
-            slot.Init(item.Value.pTableInfo);
+            slot.Init(item.Value, EItemValueType.None);
         }
 
         //

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-public class Com_Base : MonoBehaviour
+public abstract class Com_Base : MonoBehaviour
 {
     /// <summary>
     /// 

@@ -23,7 +23,7 @@ public class Com_Inventory_Items : Com_Slots<Com_Item_Slot>
 
             //
             var slot = ActivateSlot();
-            slot.Init(item.Value.pTableInfo, item.Value.pCount);
+            slot.Init(item.Value, EItemValueType.Name);
         }
 
         //

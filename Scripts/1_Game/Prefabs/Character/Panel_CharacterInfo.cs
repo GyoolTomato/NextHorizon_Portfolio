@@ -7,10 +7,12 @@ using UnityEngine.UI;
 public class Panel_CharacterInfo : Panel_Base
 {
     //
-    [SerializeField] TextMeshProUGUI                _name;
-    [SerializeField] Image                          _characterImage;
-    [SerializeField] TextMeshProUGUI                _level;    
     [SerializeField] Com_ContentsTitle              _comTitle;
+    [SerializeField] TextMeshProUGUI                _name;
+    [SerializeField] TextMeshProUGUI                _level;   
+    [SerializeField] Image                          _characterImage;
+    [SerializeField] GameObject                     _btnLevelUp;
+    
     [SerializeField] Com_CharacterInfo_Info_Stats   _comStats;
     [SerializeField] Com_CharacterInfo_Info_Skills  _comSkills;
 
@@ -44,11 +46,21 @@ public class Panel_CharacterInfo : Panel_Base
         _character = character;
 
         //
+        Refresh();     
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Refresh()
+    {
+        //
         _name.text = Manager_UI.Instance.GetTextCharacter(_character.pTableInfo.name);
         _characterImage.sprite = Manager_Resources.Instance.GetCharacterSprite(ECharacterImageType.FullBody, _character.pTableInfo.model);
         _level.text = string.Format(Manager_UI.Instance.GetTextCommon(9000039), _character.pLevel);
+        _btnLevelUp.SetActive(!Manager_Character.Instance.IsMaxLevel(_character.pLevel));
         _comStats.Init(_character);
-        _comSkills.Init(_character);        
+        _comSkills.Init(_character);
     }
 
     /// <summary>
@@ -74,5 +86,13 @@ public class Panel_CharacterInfo : Panel_Base
     public void OnBtnCloseLevelUp()
     {
         _subLevelUp.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Tick()
+    {
+        _subLevelUp.Tick();
     }
 }

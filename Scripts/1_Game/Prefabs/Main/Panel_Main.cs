@@ -58,9 +58,9 @@ public class Panel_Main : Panel_Base
     public override void Init()
     {
         //
-        _playerLevel.text = GlobalData.Instance.pDataPlayerInfo.pLevel.ToString();
-        _playerName.text = GlobalData.Instance.pDataPlayerInfo.pUserNickName;
-        _playerExp.text = GlobalData.Instance.pDataPlayerInfo.pExp.ToString();
+        _playerLevel.text = GameData.Instance.pPlayerInfo.pLevel.ToString();
+        _playerName.text = GameData.Instance.pPlayerInfo.pUserNickName;
+        _playerExp.text = GameData.Instance.pPlayerInfo.pExp.ToString();
 
         //
         _comUserAssets.Init(EItemType.Crystal, EItemType.Gold);
