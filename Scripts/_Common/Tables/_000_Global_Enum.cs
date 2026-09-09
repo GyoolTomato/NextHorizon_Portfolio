@@ -50,9 +50,11 @@ public enum EPanelType
     PlayerInfo,
     CharacterInfo,
     PopUpInfo,
+    CharacterSelect,
     Settings,
     MessageBox,
     Flash,
+    TouchLock,
     Group_0,
     Group_1,
     Group_2,
@@ -164,10 +166,19 @@ public enum EGrade
 public enum EMissionType
 {
     None,
+    LogIn,
     Kill,
     GetIt_ExpCard,
     TimeOver,
     WorkCount,
+    End
+}
+
+public enum EMissionCycleType
+{
+    None,
+    Daily,
+    Weekly,
     End
 }
 

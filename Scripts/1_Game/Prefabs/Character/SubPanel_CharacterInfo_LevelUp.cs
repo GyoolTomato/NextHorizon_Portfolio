@@ -17,7 +17,7 @@ public class SubPanel_CharacterInfo_LevelUp : Com_Slots<Com_Item_Slot>
     [SerializeField] Com_Button _btnConfirm;
 
     //
-    Character _character;
+    DataCharacter _character;
     Com_Item_Slot _slotAlready;
     Com_Item_Slot _slotBtn;
     float _pointDownInterval;
@@ -30,7 +30,7 @@ public class SubPanel_CharacterInfo_LevelUp : Com_Slots<Com_Item_Slot>
     /// 
     /// </summary>
     /// <param name="character"></param>
-    public void Init(Character character)
+    public void Init(DataCharacter character)
     {
         //
         _character = character;
@@ -278,7 +278,7 @@ public class SubPanel_CharacterInfo_LevelUp : Com_Slots<Com_Item_Slot>
         if (eItemTypes.Count == 0)
             return;
 
-        ServerAPI.Instance.Send_CharacterLevelUp(GameData.Instance.pPlayerInfo.pUserId, _character.pTableInfo.key, eItemTypes.ToArray(), counts.ToArray(), (isSuccess)=>
+        ServerAPI.Instance.Send_CharacterLevelUp(_character.pTableInfo.key, eItemTypes.ToArray(), counts.ToArray(), (isSuccess)=>
         {
             if (isSuccess)
             {

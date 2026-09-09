@@ -20,6 +20,7 @@ public class Manager_UI : Singleton<Manager_UI>
     //
     GameObject _panelTitleObj;
     GameObject _panelMessageBoxObj;
+    GameObject _panelTouchLockObj;
 
     //
     AssetReference SpawnablePrefab;
@@ -40,6 +41,7 @@ public class Manager_UI : Singleton<Manager_UI>
 
         _panelTitleObj = Resources.Load<GameObject>("Prefabs/Panel_Title");
         _panelMessageBoxObj = Resources.Load<GameObject>("Prefabs/Panel_MessageBox");
+        _panelTouchLockObj = Resources.Load<GameObject>("Prefabs/Panel_TouchLock");
     }
 
     /// <summary>
@@ -64,6 +66,10 @@ public class Manager_UI : Singleton<Manager_UI>
         else if (panelType == EPanelType.MessageBox)
         {
             loadObject = _panelMessageBoxObj;
+        }
+        else if (panelType == EPanelType.TouchLock)
+        {
+            loadObject = _panelTouchLockObj;
         }
         else
         {
@@ -497,5 +503,52 @@ public class Manager_UI : Singleton<Manager_UI>
         var panel = ShowPanel(EPanelType.Flash) as Panel_Flash;
         panel.Init();
         panel.Show(onComplete);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="isShowDim"></param>
+    public void ShowTouchLock(bool isActiveDim = false)
+    {
+        var panel = ShowPanel(EPanelType.TouchLock) as Panel_TouchLock;
+        panel.Init(isActiveDim);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="isShowDim"></param>
+    public void HideTouchLock(bool isShowAnim = false)
+    {
+        var panel = GetPanel(EPanelType.TouchLock) as Panel_TouchLock;
+        panel.Hide(isShowAnim);        
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public string BigNumberNotation(long value)
+    {
+        var result = string.Empty;
+        var mega = value / 1000000d;
+        var kilo = value / 1000d;
+
+        if (mega >= 1)
+        {
+            result = string.Format("{0}M", mega);
+        }
+        else if (kilo >= 1)
+        {
+            result = string.Format("{0}K", kilo);
+        }
+        else
+        {
+            result = value.ToString();
+        }
+
+
+        return result;
     }
 }

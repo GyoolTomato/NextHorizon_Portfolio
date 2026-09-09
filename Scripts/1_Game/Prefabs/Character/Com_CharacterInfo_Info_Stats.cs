@@ -16,14 +16,14 @@ public class Com_CharacterInfo_Info_Stats : Com_Base
     [SerializeField] Com_CharacterInfo_Info_Stats_Slot _slotCriDmg  = null;
 
     //
-    Character _character = null;   
+    DataCharacter _character = null;   
 
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="character"></param>
-    public void Init(Character character)
+    public void Init(DataCharacter character)
     {
         //
         _character = character;

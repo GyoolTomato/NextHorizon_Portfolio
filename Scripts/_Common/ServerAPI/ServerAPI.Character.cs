@@ -4,62 +4,62 @@ using UnityEngine.Networking;
 
 public partial class ServerAPI
 {
-    public void Send_CharacterAcquire(int userId, int characterKey, int stack,
+    public void Send_CharacterAcquire(int characterKey, int stack,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        Send_CharacterOperation("/api/character/acquire", userId, characterKey, stack,
-            json => onSuccess?.Invoke(Parse_CharacterAcquire(json)), onFailure);
+        Send_CharacterOperation("/api/character/acquire", characterKey, stack,
+            json => ParseResponse(json, Parse_CharacterAcquire, onSuccess), onFailure);
     }
 
-    public void Send_CharacterList(int userId,
+    public void Send_CharacterList(
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson("/api/character/list", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerUserCharacterRequest { userId = userId }),
-            json => onSuccess?.Invoke(Parse_CharacterList(json)), onFailure);
+            JsonUtility.ToJson(new ServerUserCharacterRequest { uid = GameData.Instance.pPlayerInfo.pUid }),
+            json => ParseResponse(json, Parse_CharacterList, onSuccess), onFailure);
     }
 
-    public void Send_CharacterUpgrade(int userId, int characterKey,
+    public void Send_CharacterUpgrade(int characterKey,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson("/api/character/upgrade", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerCharacterRequest { userId = userId, characterKey = characterKey }),
-            json => onSuccess?.Invoke(Parse_CharacterUpgrade(json)), onFailure);
+            JsonUtility.ToJson(new ServerCharacterRequest { uid = GameData.Instance.pPlayerInfo.pUid, characterKey = characterKey }),
+            json => ParseResponse(json, Parse_CharacterUpgrade, onSuccess), onFailure);
     }
 
-    public void Send_CharacterUpdate(int userId, int characterKey, int stack,
+    public void Send_CharacterUpdate(int characterKey, int stack,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        Send_CharacterOperation("/api/character/update", userId, characterKey, stack,
-            json => onSuccess?.Invoke(Parse_CharacterUpdate(json)), onFailure);
+        Send_CharacterOperation("/api/character/update", characterKey, stack,
+            json => ParseResponse(json, Parse_CharacterUpdate, onSuccess), onFailure);
     }
 
-    public void Send_CharacterLevelUp(int userId, int characterKey, EItemType[] eItemTypes, long[] counts,
+    public void Send_CharacterLevelUp(int characterKey, EItemType[] eItemTypes, long[] counts,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         ServerCharacterLevelUpRequest request = new ServerCharacterLevelUpRequest
         {
-            userId = userId, characterKey = characterKey, eItemTypes = eItemTypes, counts = counts,
+            uid = GameData.Instance.pPlayerInfo.pUid, characterKey = characterKey, eItemTypes = eItemTypes, counts = counts,
         };
 
         //
         SendJson("/api/character/level-up", UnityWebRequest.kHttpVerbPOST,
             JsonUtility.ToJson(request),
-            json => onSuccess?.Invoke(Parse_CharacterLevelUp(json)), onFailure);
+            json => ParseResponse(json, Parse_CharacterLevelUp, onSuccess), onFailure);
     }
 
-    private void Send_CharacterOperation(string path, int userId, int characterKey, int stack,
+    private void Send_CharacterOperation(string path, int characterKey, int stack,
         Action<string> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         ServerCharacterRequest request = new ServerCharacterRequest
         {
-            userId = userId, characterKey = characterKey, stack = stack
+            uid = GameData.Instance.pPlayerInfo.pUid, characterKey = characterKey, stack = stack
         };
 
         //
@@ -82,7 +82,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.CharacterListReceivedEvent>.Instance.Broadcast(new Observer.CharacterListReceivedEvent(characters));
+        var packet = new Observer.CharacterListReceivedEvent(characters);
+
+        //
+        Observer.ObserverTracker<Observer.CharacterListReceivedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -99,7 +102,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.CharacterUpgradedEvent>.Instance.Broadcast(new Observer.CharacterUpgradedEvent(character));
+        var packet = new Observer.CharacterUpgradedEvent(character);
+
+        //
+        Observer.ObserverTracker<Observer.CharacterUpgradedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -136,7 +142,10 @@ public partial class ServerAPI
         }
 
         //
-        Observer.ObserverTracker<Observer.CharacterLevelUpEvent>.Instance.Broadcast(new Observer.CharacterLevelUpEvent(response));
+        var packet = new Observer.CharacterLevelUpEvent(response);
+
+        //
+        Observer.ObserverTracker<Observer.CharacterLevelUpEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -153,7 +162,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.CharacterOperationSucceededEvent>.Instance.Broadcast(new Observer.CharacterOperationSucceededEvent(success));
+        var packet = new Observer.CharacterOperationSucceededEvent(success);
+
+        //
+        Observer.ObserverTracker<Observer.CharacterOperationSucceededEvent>.Instance.Broadcast(packet);
 
         //
         return success;

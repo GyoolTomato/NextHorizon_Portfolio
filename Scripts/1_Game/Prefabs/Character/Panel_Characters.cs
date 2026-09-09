@@ -69,7 +69,7 @@ public class Panel_Characters : Panel_Slots<Com_Characters_Slot>
     /// <summary>
     /// 
     /// </summary>
-    void OnBtnSlot(Character character)
+    void OnBtnSlot(DataCharacter character)
     {
         var panel = Manager_UI.Instance.ShowPanel(EPanelType.CharacterInfo) as Panel_CharacterInfo;
         panel.Init(character);

@@ -11,6 +11,7 @@ public class Com_Title_Login : Com_Base
 {
     private const string GoogleWebClientId =
         "693264845451-4019fn8u077jb0nl7jrq0t69ju7cbmnj.apps.googleusercontent.com";
+    private const string GuestLoginPreferenceKey = "NextHorizon.GuestLogin";
 
     //
     [SerializeField] GameObject _btnLogInGoogle;
@@ -46,11 +47,13 @@ public class Com_Title_Login : Com_Base
         EnsureGoogleSignInConfiguration();
 
         _btnLogInGoogle.SetActive(false);
-        _btnLogInGuest.SetActive(false);
+        _btnLogInGuest.SetActive(true);
         _btnLogOut.SetActive(false);
         _txtLogInType.gameObject.SetActive(false);
         _btnMessageForPlayGame.SetActive(false);
         _txtMessage.gameObject.SetActive(false);
+
+        SetState(IsGuestLoginSaved() ? EState.LogIn_Guest : EState.None);
 
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
         {
@@ -62,6 +65,11 @@ public class Com_Title_Login : Com_Base
 
             FirebaseApp app = FirebaseApp.DefaultInstance;
             _auth = FirebaseAuth.DefaultInstance;
+
+            if (_auth.CurrentUser != null && _auth.CurrentUser.IsAnonymous)
+            {
+                _auth.SignOut();
+            }
 
             _isInitialized = true;
 
@@ -77,18 +85,27 @@ public class Com_Title_Login : Com_Base
     /// <returns></returns>
     public EState GetCurrentLogInType()
     {
-        if (_auth.CurrentUser == null)
-        {
-            return EState.None;
-        }
-        else if (_auth.CurrentUser.IsAnonymous)
-        {
-            return EState.LogIn_Guest;
-        }
-        else
+        if (_auth != null && _auth.CurrentUser != null && !_auth.CurrentUser.IsAnonymous)
         {
             return EState.LogIn_Google;
         }
+
+        if (IsGuestLoginSaved())
+        {
+            return EState.LogIn_Guest;
+        }
+
+        return EState.None;
+    }
+
+    private static bool IsGuestLoginSaved()
+        => PlayerPrefs.GetInt(GuestLoginPreferenceKey, 0) == 1;
+
+    private static void SaveGuestLogin(bool value)
+    {
+        if (value) PlayerPrefs.SetInt(GuestLoginPreferenceKey, 1);
+        else PlayerPrefs.DeleteKey(GuestLoginPreferenceKey);
+        PlayerPrefs.Save();
     }
 
     /// <summary>
@@ -116,7 +133,7 @@ public class Com_Title_Login : Com_Base
 
         if (_txtLogInType.gameObject.activeSelf)
         {
-            _txtLogInType.text = _auth.CurrentUser.IsAnonymous ? "Guest Log In" : "Google Log In";
+            _txtLogInType.text = state == EState.LogIn_Guest ? "Guest Log In" : "Google Log In";
         }
         
         if (_txtMessage.gameObject.activeSelf)
@@ -235,6 +252,7 @@ public class Com_Title_Login : Com_Base
             Debug.LogFormat("User signed in successfully: {0} ({1})",
                 newUser.DisplayName, newUser.UserId);
 
+            SaveGuestLogin(false);
             SetState(GetCurrentLogInType());
         });
     }
@@ -251,25 +269,10 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        _auth.SignInAnonymouslyAsync().ContinueWithOnMainThread(authTask =>
-        {
-            if (authTask.IsCanceled)
-            {
-                Debug.LogError("Anonymous Sign-In was canceled.");
-                return;
-            }
-            if (authTask.IsFaulted)
-            {
-                Debug.LogError("Anonymous Sign-In encountered an error: " + authTask.Exception);
-                return;
-            }
-
-            FirebaseUser newUser = authTask.Result.User;
-            Debug.LogFormat("User signed in anonymously: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
-
-            SetState(GetCurrentLogInType());
-        });
+        // Guest accounts no longer sign in to Firebase.
+        // _auth.SignInAnonymouslyAsync();
+        SaveGuestLogin(true);
+        SetState(EState.LogIn_Guest);
     }
 
     /// <summary>
@@ -284,7 +287,7 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        _auth.SignOut();
+        _auth?.SignOut();
 
         //
 #if !UNITY_EDITOR
@@ -295,7 +298,8 @@ public class Com_Title_Login : Com_Base
 #endif
 
         //
-        SetState(GetCurrentLogInType());
+        SaveGuestLogin(false);
+        SetState(EState.None);
     }
 
     /// <summary>

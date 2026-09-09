@@ -1,4 +1,5 @@
 using Firebase.Auth;
+using Firebase.Extensions;
 using UnityEngine;
 
 public class LogoState_LogIn : LogoState,
@@ -7,7 +8,8 @@ public class LogoState_LogIn : LogoState,
     Observer.IObserver<Observer.NewUserRequiredEvent>
 {
     private string _loginLocalId;
-    private string _loginFirebaseUid;
+    private string _loginFirebaseToken;
+    private bool _isGuestLogin;
     public LogoState_LogIn(ELogoState state) : base(state)
     {
     }
@@ -35,61 +37,47 @@ public class LogoState_LogIn : LogoState,
 
     public void DoLogin()
     {
-        if (FirebaseAuth.DefaultInstance == null)
-        {
-            Debug.LogError("FirebaseAuth.DefaultInstance is null");
-            return;
-        }
-
-        if (FirebaseAuth.DefaultInstance.CurrentUser == null)
-        {
-            Debug.LogError("Firebase current user is not ready.");
-            return;
-        }
-
-        string localId = ProgramSettings.Instance.GetLocalUserId();
-        string firebaseUid = FirebaseAuth.DefaultInstance.CurrentUser.UserId;
-        _loginLocalId = localId;
-        _loginFirebaseUid = firebaseUid;
-
-        if (string.IsNullOrWhiteSpace(localId))
-        {
-            Debug.LogError("Local user ID is empty.");
-            return;
-        }
-
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
+        string localId = ProgramSettings.Instance.GetLocalUserId();
+        _isGuestLogin = panel.pComLogin.GetCurrentLogInType() == Com_Title_Login.EState.LogIn_Guest;
         panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
 
-        ServerAPI.Instance.Send_Login(
-            localId,
-            firebaseUid,
-            success =>
+        if (_isGuestLogin)
+        {
+            if (string.IsNullOrWhiteSpace(localId))
             {
-                // 로그인 응답 파싱과 후속 처리는 옵저버 이벤트에서 수행한다.
-            },
-            HandleRequestFailure);
+                Debug.LogError("Local user ID is empty.");
+                return;
+            }
+            _loginLocalId = localId;
+            _loginFirebaseToken = null;
+            ServerAPI.Instance.Send_GuestLogin(localId, success => { }, HandleRequestFailure);
+            return;
+        }
+
+        FirebaseUser firebaseUser = FirebaseAuth.DefaultInstance?.CurrentUser;
+        if (firebaseUser == null) { Debug.LogError("Firebase current user is not ready."); return; }
+        firebaseUser.TokenAsync(false).ContinueWithOnMainThread(task => {
+            if (task.IsCanceled || task.IsFaulted) { Debug.LogError("Firebase token request failed: " + task.Exception); return; }
+            _loginLocalId = null;
+            _loginFirebaseToken = task.Result;
+            ServerAPI.Instance.Send_FirebaseLogin(_loginFirebaseToken, success => { }, HandleRequestFailure);
+        });
     }
 
     public void OnEvent(Observer.LoginSucceededEvent message)
     {
         //
         ServerUserData user = message.User;
-        Debug.Log($"로그인 성공: userId={user.id}, items={user.items?.Length ?? 0}, characters={user.characters?.Length ?? 0}");
-        UserData data = new UserData
-        {
-            id = user.id,
-            localId = user.localId,
-            firebaseUid = user.firebaseUid,
-            nickname = user.nickname,
-            level = user.level
-        };
+        ServerPlayerInfoData playerInfo = user.playerInfo;
+        Debug.Log($"로그인 성공: uid={playerInfo.uid}, level={playerInfo.level}, exp={playerInfo.exp}");
 
         //
         GameData.Instance.Init();
-        GameData.Instance.pPlayerInfo.Init(data);
+        GameData.Instance.pPlayerInfo.Init(playerInfo);
         GameData.Instance.pDataInventory.Init(user.items, user.armors, user.weapons);
         GameData.Instance.pDataCharacter.Init(user.characters);
+        GameData.Instance.pDataMissions.Init(user.missions);
 
         //
         GameManager.ChangeGameScene();
@@ -100,7 +88,6 @@ public class LogoState_LogIn : LogoState,
         Debug.Log($"신규 사용자 계정을 생성합니다: {message.LocalId}");
         CreateNewUser(
             message.LocalId,
-            message.FirebaseUid,
             CreateInitialNickname(message.LocalId));
     }
 
@@ -118,30 +105,28 @@ public class LogoState_LogIn : LogoState,
         return $"User{idPart}";
     }
 
-    public void CreateNewUser(string localId, string firebaseUid, string nickname)
+    public void CreateNewUser(string localId, string nickname)
     {
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
         panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
 
-        ServerAPI.Instance.Send_CreateUser(
-            localId,
-            firebaseUid,
-            nickname,
-            success => { },
-            HandleRequestFailure);
+        if (_isGuestLogin)
+            ServerAPI.Instance.Send_CreateGuest(localId, nickname, success => { }, HandleRequestFailure);
+        else
+            ServerAPI.Instance.Send_CreateFirebase(_loginFirebaseToken, nickname, success => { }, HandleRequestFailure);
     }
 
     public void OnEvent(Observer.LoginResponseParsedEvent message)
     {
-        if (message.Response.isNew)
+        if (message.Data.isNew)
         {
             Observer.ObserverTracker<Observer.NewUserRequiredEvent>.Instance.Broadcast(
-                new Observer.NewUserRequiredEvent(_loginLocalId, _loginFirebaseUid));
+                new Observer.NewUserRequiredEvent(_loginLocalId));
             return;
         }
 
         Observer.ObserverTracker<Observer.LoginSucceededEvent>.Instance.Broadcast(
-            new Observer.LoginSucceededEvent(message.Response.user));
+            new Observer.LoginSucceededEvent(message.Data.user));
     }
 
     private void HandleRequestFailure(ServerAPIError error)

@@ -33,7 +33,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_Hp(Character character)
+    public double GetStat_Hp(DataCharacter character)
     {
         var temp = character.pTableInfo.hp + (character.pLevel * character.pTableInfo.hp_level);
 
@@ -45,7 +45,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_Atk(Character character)
+    public double GetStat_Atk(DataCharacter character)
     {
         var temp = character.pTableInfo.atk + (character.pLevel * character.pTableInfo.atk_level);
 
@@ -57,7 +57,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_Def(Character character)
+    public double GetStat_Def(DataCharacter character)
     {
         var temp = character.pTableInfo.def + (character.pLevel * character.pTableInfo.def_level);
 
@@ -69,7 +69,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_Avoid(Character character)
+    public double GetStat_Avoid(DataCharacter character)
     {
         var temp = character.pTableInfo.avoid + (character.pLevel * character.pTableInfo.avoid_level);
 
@@ -81,7 +81,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_Focus(Character character)
+    public double GetStat_Focus(DataCharacter character)
     {
         var temp = character.pTableInfo.focus + (character.pLevel * character.pTableInfo.focus_level);
 
@@ -93,7 +93,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_AtkSpd(Character character)
+    public double GetStat_AtkSpd(DataCharacter character)
     {
         var temp = character.pTableInfo.atkspd + (character.pLevel * character.pTableInfo.atkspd_level);
 
@@ -105,7 +105,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_CriRate(Character character)
+    public double GetStat_CriRate(DataCharacter character)
     {
         var temp = character.pTableInfo.crirate + (character.pLevel * character.pTableInfo.crirate_level);
 
@@ -117,7 +117,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// </summary>
     /// <param name="character"></param>
     /// <returns></returns>
-    public double GetStat_CriDmg(Character character)
+    public double GetStat_CriDmg(DataCharacter character)
     {
         var temp = character.pTableInfo.cridmg + (character.pLevel * character.pTableInfo.cridmg_level);
 

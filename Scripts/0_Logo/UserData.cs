@@ -8,7 +8,7 @@ public class UserData
     public string firebaseUid;
     public string nickname;
     public int level;
-    public int exp;
+    public long exp;
     public int gold;
 }
 

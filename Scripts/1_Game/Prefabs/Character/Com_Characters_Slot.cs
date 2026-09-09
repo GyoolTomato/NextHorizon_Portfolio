@@ -13,11 +13,11 @@ public class Com_Characters_Slot : Com_Base
     [SerializeField] TextMeshProUGUI _value;
 
     //
-    Character _character = null;
-    Action<Character> _onBtnSlot = null;
+    DataCharacter _character = null;
+    Action<DataCharacter> _onBtnSlot = null;
 
     //
-    public void Init(Character character, Panel_Characters.EViewMode viewMode, Action<Character> onBtnSlot)
+    public void Init(DataCharacter character, Panel_Characters.EViewMode viewMode, Action<DataCharacter> onBtnSlot)
     {
         //
         _character = character;

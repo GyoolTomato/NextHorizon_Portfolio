@@ -9,7 +9,7 @@ public partial class ServerAPI
     {
         //
         SendJson("/api/version", UnityWebRequest.kHttpVerbGET, string.Empty,
-            json => onSuccess?.Invoke(Parse_Version(json)), onFailure);
+            json => ParseResponse(json, Parse_Version, onSuccess), onFailure);
     }
 
     public bool Parse_Version(string json)
@@ -23,7 +23,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.VersionReceivedEvent>.Instance.Broadcast(new Observer.VersionReceivedEvent(response));
+        var packet = new Observer.VersionReceivedEvent(response);
+
+        //
+        Observer.ObserverTracker<Observer.VersionReceivedEvent>.Instance.Broadcast(packet);
 
         //
         return true;

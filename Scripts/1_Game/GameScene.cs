@@ -31,9 +31,7 @@ public static class GameScene
         _curState = null;
 
         //       
-        GameData.Instance.pDataGacha    .Init();
-        GameData.Instance.pDataMissions .Init();
-        GameData.Instance.pDataShop     .Init();
+        GameData.Instance.pDataGacha.Init();
 
         //        
         Manager_UI.Instance.Init();

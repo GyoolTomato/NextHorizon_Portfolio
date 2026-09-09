@@ -8,6 +8,7 @@ public class Manager_Table : Singleton<Manager_Table>
     //
     Dictionary<EItemType, _101_Items.Values> _dic_Items = new Dictionary<EItemType, _101_Items.Values>();
     Dictionary<int, _107_CharacterLevel.Values> _dic_Level_CharacterLevel = new Dictionary<int, _107_CharacterLevel.Values>();
+    Dictionary<int, _108_PlayerLevel.Values> _dic_Level_PlayerLevel = new Dictionary<int, _108_PlayerLevel.Values>();
 
 
     /// <summary>
@@ -41,6 +42,20 @@ public class Manager_Table : Singleton<Manager_Table>
 
             //
             _dic_Level_CharacterLevel.Add(item.level, item);
+        }
+
+        //
+        foreach (var item in _108_PlayerLevel.GetList())
+        {
+            //
+            if (_dic_Level_PlayerLevel.ContainsKey(item.level))
+            {
+                Debug.LogError($"Manager_Table::Init() - Duplicate level key found: {item.level}");
+                continue;
+            }
+
+            //
+            _dic_Level_PlayerLevel.Add(item.level, item);
         }
     }
 
@@ -76,6 +91,24 @@ public class Manager_Table : Singleton<Manager_Table>
         else
         {
             Debug.LogError($"Manager_Table::GetCharacterLevelInfo() - Level info not found for level: {level}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    public _108_PlayerLevel.Values GetPlayerLevelInfo(int level)
+    {
+        if (_dic_Level_PlayerLevel.ContainsKey(level))
+        {
+            return _dic_Level_PlayerLevel[level];
+        }
+        else
+        {
+            Debug.LogError($"Manager_Table::GetPlayerLevelInfo() - Level info not found for level: {level}");
             return null;
         }
     }

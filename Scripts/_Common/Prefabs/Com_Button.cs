@@ -49,7 +49,6 @@ public class Com_Button : Com_Base
     /// <param name="text"></param>
     public void SetText(string text)
     {
-
         _text.text = text;
     }
 

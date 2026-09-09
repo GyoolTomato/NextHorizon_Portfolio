@@ -4,73 +4,73 @@ using UnityEngine.Networking;
 
 public partial class ServerAPI
 {
-    public void Send_ItemAcquire(int userId, int itemKey, int quantity,
+    public void Send_ItemAcquire(int itemKey, int quantity,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        Send_ItemOperation("/api/item/acquire", userId, itemKey, quantity,
-            json => onSuccess?.Invoke(Parse_ItemAcquire(json)), onFailure);
+        Send_ItemOperation("/api/item/acquire", itemKey, quantity,
+            json => ParseResponse(json, Parse_ItemAcquire, onSuccess), onFailure);
     }
 
-    public void Send_ItemConsume(int userId, int itemKey, int quantity,
+    public void Send_ItemConsume(int itemKey, int quantity,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        Send_ItemOperation("/api/item/consume", userId, itemKey, quantity,
-            json => onSuccess?.Invoke(Parse_ItemConsume(json)), onFailure);
+        Send_ItemOperation("/api/item/consume", itemKey, quantity,
+            json => ParseResponse(json, Parse_ItemConsume, onSuccess), onFailure);
     }
 
-    public void Send_ItemUpdate(int userId, int itemKey, int quantity,
+    public void Send_ItemUpdate(int itemKey, int quantity,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        Send_ItemOperation("/api/item/update", userId, itemKey, quantity,
-            json => onSuccess?.Invoke(Parse_ItemUpdate(json)), onFailure);
+        Send_ItemOperation("/api/item/update", itemKey, quantity,
+            json => ParseResponse(json, Parse_ItemUpdate, onSuccess), onFailure);
     }
 
-    public void Send_ItemList(int userId,
+    public void Send_ItemList(
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson(
             "/api/item/list",
             UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerUserItemRequest { userId = userId }),
-            json => onSuccess?.Invoke(Parse_ItemList(json)),
+            JsonUtility.ToJson(new ServerUserItemRequest { uid = GameData.Instance.pPlayerInfo.pUid }),
+            json => ParseResponse(json, Parse_ItemList, onSuccess),
             onFailure);
     }
 
-    public void Send_ArmorList(int userId,
+    public void Send_ArmorList(
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson(
             "/api/armor/list",
             UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerUserItemRequest { userId = userId }),
-            json => onSuccess?.Invoke(Parse_ArmorList(json)),
+            JsonUtility.ToJson(new ServerUserItemRequest { uid = GameData.Instance.pPlayerInfo.pUid }),
+            json => ParseResponse(json, Parse_ArmorList, onSuccess),
             onFailure);
     }
 
-    public void Send_WeaponList(int userId,
+    public void Send_WeaponList(
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson(
             "/api/weapon/list",
             UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerUserItemRequest { userId = userId }),
-            json => onSuccess?.Invoke(Parse_WeaponList(json)),
+            JsonUtility.ToJson(new ServerUserItemRequest { uid = GameData.Instance.pPlayerInfo.pUid }),
+            json => ParseResponse(json, Parse_WeaponList, onSuccess),
             onFailure);
     }
 
-    public void Send_ArmorEquip(int userId, int characterKey, int id,
+    public void Send_ArmorEquip(int characterKey, int id,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         ServerArmorEquipRequest request = new ServerArmorEquipRequest
         {
-            userId = userId,
+            uid = GameData.Instance.pPlayerInfo.pUid,
             characterKey = characterKey,
             id = id,
         };
@@ -78,16 +78,16 @@ public partial class ServerAPI
         //
         SendJson("/api/armor/equip", UnityWebRequest.kHttpVerbPOST,
             JsonUtility.ToJson(request),
-            json => onSuccess?.Invoke(Parse_ArmorEquip(json)), onFailure);
+            json => ParseResponse(json, Parse_ArmorEquip, onSuccess), onFailure);
     }
 
-    public void Send_WeaponEquip(int userId, int characterKey, int id,
+    public void Send_WeaponEquip(int characterKey, int id,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         ServerWeaponEquipRequest request = new ServerWeaponEquipRequest
         {
-            userId = userId,
+            uid = GameData.Instance.pPlayerInfo.pUid,
             characterKey = characterKey,
             id = id,
         };
@@ -95,34 +95,34 @@ public partial class ServerAPI
         //
         SendJson("/api/weapon/equip", UnityWebRequest.kHttpVerbPOST,
             JsonUtility.ToJson(request),
-            json => onSuccess?.Invoke(Parse_WeaponEquip(json)), onFailure);
+            json => ParseResponse(json, Parse_WeaponEquip, onSuccess), onFailure);
     }
 
-    public void Send_ArmorRelease(int userId, int id,
+    public void Send_ArmorRelease(int id,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson("/api/armor/release", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerInventoryReleaseRequest { userId = userId, id = id }),
-            json => onSuccess?.Invoke(Parse_ArmorRelease(json)), onFailure);
+            JsonUtility.ToJson(new ServerInventoryReleaseRequest { uid = GameData.Instance.pPlayerInfo.pUid, id = id }),
+            json => ParseResponse(json, Parse_ArmorRelease, onSuccess), onFailure);
     }
 
-    public void Send_WeaponRelease(int userId, int id,
+    public void Send_WeaponRelease(int id,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         SendJson("/api/weapon/release", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerInventoryReleaseRequest { userId = userId, id = id }),
-            json => onSuccess?.Invoke(Parse_WeaponRelease(json)), onFailure);
+            JsonUtility.ToJson(new ServerInventoryReleaseRequest { uid = GameData.Instance.pPlayerInfo.pUid, id = id }),
+            json => ParseResponse(json, Parse_WeaponRelease, onSuccess), onFailure);
     }
 
-    private void Send_ItemOperation(string path, int userId, int itemKey, int quantity,
+    private void Send_ItemOperation(string path, int itemKey, int quantity,
         Action<string> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
         ServerItemRequest request = new ServerItemRequest
         {
-            userId = userId,
+            uid = GameData.Instance.pPlayerInfo.pUid,
             itemKey = itemKey,
             quantity = quantity
         };
@@ -144,11 +144,11 @@ public partial class ServerAPI
         //
         bool success = response != null && response.success;
 
-        // Post-process
+        //
+        var packet = new Observer.ItemOperationSucceededEvent(success);
 
         //
-        Observer.ObserverTracker<Observer.ItemOperationSucceededEvent>.Instance.Broadcast(
-            new Observer.ItemOperationSucceededEvent(success));
+        Observer.ObserverTracker<Observer.ItemOperationSucceededEvent>.Instance.Broadcast(packet);
 
         //
         return success;
@@ -169,8 +169,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.ItemListReceivedEvent>.Instance.Broadcast(
-            new Observer.ItemListReceivedEvent(items));
+        var packet = new Observer.ItemListReceivedEvent(items);
+
+        //
+        Observer.ObserverTracker<Observer.ItemListReceivedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -191,8 +193,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.ArmorListReceivedEvent>.Instance.Broadcast(
-            new Observer.ArmorListReceivedEvent(armors));
+        var packet = new Observer.ArmorListReceivedEvent(armors);
+
+        //
+        Observer.ObserverTracker<Observer.ArmorListReceivedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -213,8 +217,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.WeaponListReceivedEvent>.Instance.Broadcast(
-            new Observer.WeaponListReceivedEvent(weapons));
+        var packet = new Observer.WeaponListReceivedEvent(weapons);
+
+        //
+        Observer.ObserverTracker<Observer.WeaponListReceivedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -231,7 +237,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.ArmorEquippedEvent>.Instance.Broadcast(new Observer.ArmorEquippedEvent(armor));
+        var packet = new Observer.ArmorEquippedEvent(armor);
+
+        //
+        Observer.ObserverTracker<Observer.ArmorEquippedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -248,7 +257,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.WeaponEquippedEvent>.Instance.Broadcast(new Observer.WeaponEquippedEvent(weapon));
+        var packet = new Observer.WeaponEquippedEvent(weapon);
+
+        //
+        Observer.ObserverTracker<Observer.WeaponEquippedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -265,7 +277,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.ArmorReleasedEvent>.Instance.Broadcast(new Observer.ArmorReleasedEvent(armor));
+        var packet = new Observer.ArmorReleasedEvent(armor);
+
+        //
+        Observer.ObserverTracker<Observer.ArmorReleasedEvent>.Instance.Broadcast(packet);
 
         //
         return true;
@@ -282,7 +297,10 @@ public partial class ServerAPI
         // Post-process
 
         //
-        Observer.ObserverTracker<Observer.WeaponReleasedEvent>.Instance.Broadcast(new Observer.WeaponReleasedEvent(weapon));
+        var packet = new Observer.WeaponReleasedEvent(weapon);
+
+        //
+        Observer.ObserverTracker<Observer.WeaponReleasedEvent>.Instance.Broadcast(packet);
 
         //
         return true;

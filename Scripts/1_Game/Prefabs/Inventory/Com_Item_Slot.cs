@@ -69,7 +69,7 @@ public class Com_Item_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, I
     {
         //
         if (_quantity != null)
-            _quantity.text = pData.pCount.ToString();
+            _quantity.text = Manager_UI.Instance.BigNumberNotation(pData.pCount);
 
         if (_value != null)
             _value.text = Manager_Inventory.Instance.GetValueText(pData, _type);

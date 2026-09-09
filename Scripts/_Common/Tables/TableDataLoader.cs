@@ -23,6 +23,8 @@ namespace Data
         public List<_106_Weapons.Values> _list_106_Weapons = new List<_106_Weapons.Values>();
         public Dictionary<int, _107_CharacterLevel.Values> _dic_107_CharacterLevel = new Dictionary<int, _107_CharacterLevel.Values>();
         public List<_107_CharacterLevel.Values> _list_107_CharacterLevel = new List<_107_CharacterLevel.Values>();
+        public Dictionary<int, _108_PlayerLevel.Values> _dic_108_PlayerLevel = new Dictionary<int, _108_PlayerLevel.Values>();
+        public List<_108_PlayerLevel.Values> _list_108_PlayerLevel = new List<_108_PlayerLevel.Values>();
         public Dictionary<int, _800_Notice.Values> _dic_800_Notice = new Dictionary<int, _800_Notice.Values>();
         public List<_800_Notice.Values> _list_800_Notice = new List<_800_Notice.Values>();
         public Dictionary<int, _900_CommonText.Values> _dic_900_CommonText = new Dictionary<int, _900_CommonText.Values>();
@@ -94,6 +96,12 @@ namespace Data
             {
                 _list_107_CharacterLevel.Add(item);
                 _dic_107_CharacterLevel.Add(item.key, item);
+            }
+            var temp_108_PlayerLevel = JsonConvert.DeserializeObject<List<_108_PlayerLevel.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_108_PlayerLevel.bytes").text);
+            foreach (var item in temp_108_PlayerLevel)
+            {
+                _list_108_PlayerLevel.Add(item);
+                _dic_108_PlayerLevel.Add(item.key, item);
             }
             var temp_800_Notice = JsonConvert.DeserializeObject<List<_800_Notice.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_800_Notice.bytes").text);
             foreach (var item in temp_800_Notice)

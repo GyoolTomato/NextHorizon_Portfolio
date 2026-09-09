@@ -10,17 +10,21 @@ public class _104_Missions
         public int key { private set; get; }
         public int title { private set; get; }
         public EMissionType type { private set; get; }
+        public EMissionCycleType cycleType { private set; get; }
         public int count { private set; get; }
+        public long exp { private set; get; }
         public int[] rewardKeys { private set; get; }
         public long[] rewardCounts { private set; get; }
 
         [JsonConstructor]
-        public Values(int key,int title,EMissionType type,int count,int[] rewardKeys,long[] rewardCounts)
+        public Values(int key,int title,EMissionType type,EMissionCycleType cycleType,int count,long exp,int[] rewardKeys,long[] rewardCounts)
         {
             this.key = key;
             this.title = title;
             this.type = type;
+            this.cycleType = cycleType;
             this.count = count;
+            this.exp = exp;
             this.rewardKeys = rewardKeys;
             this.rewardCounts = rewardCounts;
         }

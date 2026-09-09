@@ -22,6 +22,9 @@ public class Panel_Flash : Panel_Base
                 
         //
         pPanelType = EPanelType.Flash;
+
+        //
+        _dim.color = new Color(1f, 1f, 1f, 0f);
     }
 
     /// <summary>
@@ -32,6 +35,7 @@ public class Panel_Flash : Panel_Base
         //
         _sequence?.Kill();
 
+        //
         _dim.color = new Color(1f, 1f, 1f, 0f);
     }
 

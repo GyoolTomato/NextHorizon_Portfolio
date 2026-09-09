@@ -253,7 +253,7 @@ public class Manager_Addressable : Singleton<Manager_Addressable>
         for (EPanelType i = EPanelType.None + 1; i < EPanelType.End; i++)
         {
             //
-            if (i == EPanelType.Title || i == EPanelType.MessageBox || i == EPanelType.Group_0 || i == EPanelType.Group_1 || i == EPanelType.Group_2)
+            if (i == EPanelType.Title || i == EPanelType.MessageBox || i == EPanelType.TouchLock || i == EPanelType.Group_0 || i == EPanelType.Group_1 || i == EPanelType.Group_2)
             {
                 continue;
             }

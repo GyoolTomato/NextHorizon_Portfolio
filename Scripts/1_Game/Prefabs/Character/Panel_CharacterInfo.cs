@@ -19,7 +19,7 @@ public class Panel_CharacterInfo : Panel_Base
     [SerializeField] SubPanel_CharacterInfo_LevelUp _subLevelUp;
 
     //
-    Character _character = null;
+    DataCharacter _character = null;
 
 
     /// <summary>
@@ -36,7 +36,7 @@ public class Panel_CharacterInfo : Panel_Base
     /// 
     /// </summary>
     /// <param name="character"></param>
-    public void Init(Character character)
+    public void Init(DataCharacter character)
     {
         //
         _comTitle.Init(OnBtnClose);

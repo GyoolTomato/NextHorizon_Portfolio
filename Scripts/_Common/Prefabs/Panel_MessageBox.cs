@@ -16,8 +16,8 @@ public class Panel_MessageBox : Panel_Base
     //
     [SerializeField] TextMeshProUGUI _title;
     [SerializeField] TextMeshProUGUI _message;
-    [SerializeField] Button _btnConfirm;
-    [SerializeField] Button _btnCancel;
+    [SerializeField] Com_Button _btnConfirm;
+    [SerializeField] Com_Button _btnCancel;
 
     //
     Action _onConfirm;
@@ -42,6 +42,9 @@ public class Panel_MessageBox : Panel_Base
         _title.text = title;
         _message.text = message;
 
+        _btnConfirm.SetActive(true);
+        _btnCancel.SetActive(true);
+
         _btnConfirm.gameObject.SetActive(type == EType.ConfirmCancel || type == EType.OK);
         _btnCancel.gameObject.SetActive(type == EType.ConfirmCancel);
 
@@ -56,7 +59,7 @@ public class Panel_MessageBox : Panel_Base
     {
         _onConfirm?.Invoke();
 
-        Manager_UI.Instance.HidePanel(EPanelType.MessageBox);
+        Hide();
     }
 
     /// <summary>
@@ -66,6 +69,6 @@ public class Panel_MessageBox : Panel_Base
     {
         _onCancel?.Invoke();
 
-        Manager_UI.Instance.HidePanel(EPanelType.MessageBox);
+        Hide();
     }
 }

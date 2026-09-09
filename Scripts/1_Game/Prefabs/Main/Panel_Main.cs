@@ -18,8 +18,9 @@ public class Panel_Main : Panel_Base
     [SerializeField] RectTransform _rtMenu = null;
 
     [SerializeField] TextMeshProUGUI _playerLevel = null;
-    [SerializeField] TextMeshProUGUI _playerName = null;
+    [SerializeField] TextMeshProUGUI _playerName = null;    
     [SerializeField] TextMeshProUGUI _playerExp = null;
+    [SerializeField] RectTransform _playerExpSlider = null;
 
     [SerializeField] Com_UserAssets _comUserAssets = null;
 
@@ -58,12 +59,13 @@ public class Panel_Main : Panel_Base
     public override void Init()
     {
         //
-        _playerLevel.text = GameData.Instance.pPlayerInfo.pLevel.ToString();
-        _playerName.text = GameData.Instance.pPlayerInfo.pUserNickName;
-        _playerExp.text = GameData.Instance.pPlayerInfo.pExp.ToString();
+        base.Init();
 
         //
         _comUserAssets.Init(EItemType.Crystal, EItemType.Gold);
+
+        //
+        Refresh();
     }
 
     /// <summary>
@@ -71,6 +73,14 @@ public class Panel_Main : Panel_Base
     /// </summary>
     public override void Refresh()
     {
+        //
+        _playerLevel.text = GD.pPlayerInfo.pLevel.ToString();
+        _playerName.text = GD.pPlayerInfo.pUserNickName;
+        _playerExp.text = string.Format("{0} / {1}", GD.pPlayerInfo.pExp, Manager_Table.Instance.GetPlayerLevelInfo(GD.pPlayerInfo.pLevel).expToNextLevel);
+        _playerExpSlider.localScale = new Vector3(
+            Convert.ToSingle(GD.pPlayerInfo.pExp) / Manager_Table.Instance.GetPlayerLevelInfo(GD.pPlayerInfo.pLevel).expToNextLevel, 
+            1f, 1f);
+
         //
         var textSupports = transform.GetComponentsInChildren<TextSupport>();
         foreach (var item in textSupports)
@@ -84,10 +94,8 @@ public class Panel_Main : Panel_Base
     /// </summary>
     public void OnBtnPlayerInfo()
     {
-        Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextCommon(9000045), Manager_UI.Instance.GetTextSystem(9990007), Panel_MessageBox.EType.OK, () =>
-        {
-            return;
-        });
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.PlayerInfo) as Panel_PlayerInfo;
+        panel.Init();
     }
 
     /// <summary>

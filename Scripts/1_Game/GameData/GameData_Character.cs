@@ -3,11 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+public class DataCharacter
+{
+    //
+    public bool pIsActive { set; get; } = false;
+    public int pGrade { set; get; } = 1;
+    public int pStack { set; get; } = 0;
+    public int pLevel { set; get; } = 1;
+    public long pExp { set; get; } = 0;
+    public int pActiveLv { set; get; } = 0;
+    public int[] pPassiveLv { set; get; } = new int[3] { 0, 0, 0 };
+    public int pCharm { set; get; } = 0;
+    public _102_Character.Values pTableInfo { private set; get; } = null;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tableInfo"></param>
+    public DataCharacter(_102_Character.Values tableInfo)
+    {
+        pTableInfo = tableInfo;
+    }
+}
+
 public class GameData_Character
 {
     //
-    public List<Character> pCharacters { private set; get; }
-    public Dictionary<int, Character> pDicCharacters { private set; get; }
+    public List<DataCharacter> pCharacters { private set; get; }
+    public Dictionary<int, DataCharacter> pDicCharacters { private set; get; }
 
 
     /// <summary>
@@ -17,31 +40,37 @@ public class GameData_Character
     {
         characters = characters.OrderBy(x => x.characterKey).ToArray();
 
-        pCharacters ??= new List<Character>();
-        pDicCharacters ??= new Dictionary<int, Character>();
+        pCharacters ??= new List<DataCharacter>();
+        pDicCharacters ??= new Dictionary<int, DataCharacter>();
 
         pCharacters.Clear();
         pDicCharacters.Clear();
 
-        var indexServerData = 0;
-        foreach (var item in _102_Character.GetList())
+        foreach (var item in characters)
         {
-            var temp = new Character(item);
-
-            var serverData = characters[indexServerData];
-            if (temp.pTableInfo.key == serverData.characterKey)
+            //
+            var tableInfo = _102_Character.GetItem(item.characterKey);
+            if (tableInfo == null)
             {
-                temp.pIsActive = true;
-                temp.pGrade = 0;
-                temp.pStack = serverData.stack;
-                temp.pLevel = serverData.level;
-                temp.pExp = serverData.exp;
-                temp.pActiveLv = 0;
-                temp.pCharm = 0;                
+                Debug.LogError("Player Character Error : " + item.characterKey);
+                continue;
             }
 
+            //
+            var temp = new DataCharacter(tableInfo)
+            {
+                pIsActive = true,
+                pGrade = item.grade,
+                pStack = item.stack,
+                pLevel = item.level,
+                pExp = item.exp,
+                pActiveLv = item.activeLv,
+                pCharm = item.charm
+            };
+
+            //
             pCharacters.Add(temp);
-            pDicCharacters.Add(item.key, temp);
+            pDicCharacters.Add(temp.pTableInfo.key, temp);
         }
     }
 
@@ -50,7 +79,7 @@ public class GameData_Character
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    public Character GetCharacter(int id)
+    public DataCharacter GetCharacter(int id)
     {
         //
         if (pDicCharacters.ContainsKey(id))

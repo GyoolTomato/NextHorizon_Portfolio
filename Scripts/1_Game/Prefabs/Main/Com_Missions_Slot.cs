@@ -8,8 +8,10 @@ public class Com_Missions_Slot : Com_Slots<Com_Item_Slot>
     [SerializeField] TextMeshProUGUI _title = null;
 
     [SerializeField] Button _btnConfirm = null;
-    [SerializeField] Image  _btnImage = null;
-    [SerializeField] TextMeshProUGUI _btnText = null;
+    [SerializeField] Image  _state = null;
+    [SerializeField] TextMeshProUGUI _txtState = null;
+
+    [SerializeField] GameObject _dimClaimed = null;
 
     //
     DataMission _data = null;
@@ -30,6 +32,10 @@ public class Com_Missions_Slot : Com_Slots<Com_Item_Slot>
         _title.text = string.Format(Manager_UI.Instance.GetTextMissions(_data.pTableInfo.title), _data.pTableInfo.count);
 
         //
+        var slotExp = ActivateSlot();
+        slotExp.Init(new DataItem(_data.pTableInfo.exp, _101_Items.GetItem(1010003)), EItemValueType.Name);
+
+        //
         for (int i = 0; i < _data.pTableInfo.rewardKeys.Length; i++)
         {
             var item = _101_Items.GetItem(_data.pTableInfo.rewardKeys[i]);
@@ -43,25 +49,33 @@ public class Com_Missions_Slot : Com_Slots<Com_Item_Slot>
         }
 
         //
+        Refresh();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Refresh()
+    {
+        //
         var isAbleClick = false;
-        var btnColor = Color.white;
-        var btnTextKey = 0;
-        if (data.IsMissionCompleted())
+        var stateColor = Manager_UI.Instance.GetColorHexaCode("#00BFFF");
+        if (_data.IsMissionCompleted())
         {
-            isAbleClick = !data.pIsTake;
-            btnColor = data.pIsTake ? Manager_UI.Instance.GetColorHexaCode("#666666") : Manager_UI.Instance.GetColorHexaCode("#228B22");
-            btnTextKey = data.pIsTake ? 9000043 : 9000041;
+            isAbleClick = !_data.pIsClaimed;
+            stateColor = _data.pIsClaimed ? Manager_UI.Instance.GetColorHexaCode("#666666") : Manager_UI.Instance.GetColorHexaCode("#228B22");
         }
         else
         {
             isAbleClick = false;
-            btnColor = Manager_UI.Instance.GetColorHexaCode("#DC3132");
-            btnTextKey = 9000042;
-            
+            //stateColor = Manager_UI.Instance.GetColorHexaCode("#DC3132");
+
         }
         _btnConfirm.interactable = isAbleClick;
-        _btnImage.color = btnColor;
-        _btnText.text = Manager_UI.Instance.GetTextCommon(btnTextKey);
+        _state.color = stateColor;
+        _txtState.text = string.Format("{0} / {1}", _data.pProgress, _data.pTableInfo.count);
+
+        _dimClaimed.SetActive(_data.pIsClaimed);
     }
 
     /// <summary>
@@ -69,6 +83,22 @@ public class Com_Missions_Slot : Com_Slots<Com_Item_Slot>
     /// </summary>
     public void OnBtnConfirm()
     {
-        
+        if (_data.pIsClaimed)
+        {
+            return;
+        }
+        else
+        {
+            if (_data.IsMissionCompleted())
+            {
+                ServerAPI.Instance.Send_MissionClaim(_data.pTableInfo.key, (success) =>
+                {
+
+                }, (error) =>
+                {
+                    Manager_UI.Instance.ShowMessageBox("", "", Panel_MessageBox.EType.OK);
+                });
+            }
+        }
     }
 }

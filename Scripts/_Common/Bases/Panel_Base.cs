@@ -7,6 +7,9 @@ using UnityEngine.UI;
 public class Panel_Base : MonoBehaviour
 {
     //
+    protected GameData GD = null;
+
+    //
     bool _isShow = false;
 
     //
@@ -38,6 +41,7 @@ public class Panel_Base : MonoBehaviour
     /// </summary>
     public virtual void OnShowPanel()
     {
+        //
         Tick();
         Tick_Sec();
     }
@@ -63,7 +67,7 @@ public class Panel_Base : MonoBehaviour
     /// </summary>
     public virtual void Init()
     {
-
+        GD ??= GameData.Instance;
     }
 
     /// <summary>
@@ -77,7 +81,7 @@ public class Panel_Base : MonoBehaviour
     /// <summary>
     /// 
     /// </summary>
-    public void Hide()
+    public virtual void Hide()
     {
         Manager_UI.Instance.HidePanel(pPanelType);
     }

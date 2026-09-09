@@ -8,14 +8,14 @@ public class Com_CharacterInfo_Info_Skills : Com_Base
     [SerializeField] Com_CharacterInfo_Info_Skills_Slot _slotPassive_1 = null;
 
     //
-    Character _character = null;
+    DataCharacter _character = null;
 
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="character"></param>
-    public void Init(Character character)
+    public void Init(DataCharacter character)
     {
         //
         _character = character;

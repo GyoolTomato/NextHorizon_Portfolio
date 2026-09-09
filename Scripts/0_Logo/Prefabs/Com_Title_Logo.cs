@@ -14,7 +14,7 @@ public class Com_Title_Logo : Com_Base, Observer.IObserver<Observer.VersionRecei
     {
         //
         var currentVersion = new Version(Application.version);
-        var serverVersion = new Version(msg.Version.nowVersion);
+        var serverVersion = new Version(msg.Data.nowVersion);
 
         //
         if (currentVersion < serverVersion)
@@ -24,7 +24,7 @@ public class Com_Title_Logo : Com_Base, Observer.IObserver<Observer.VersionRecei
             _isDoingCheckVersion = false;
             
             //
-            _url = msg.Version.downloadUrl;
+            _url = msg.Data.downloadUrl;
 
             //
             Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextSystem(9990008), Manager_UI.Instance.GetTextSystem(9990009), Panel_MessageBox.EType.OK, () =>

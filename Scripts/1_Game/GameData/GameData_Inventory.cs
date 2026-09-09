@@ -160,14 +160,15 @@ public class DataWeapon
 /// </summary>
 public class GameData_Inventory
 {
-    
+
 
     //
-    public Dictionary<EItemType, DataItem> pDicItems { private set; get; }
+    public Dictionary<int, DataItem> pDicItems { private set; get; } = new Dictionary<int, DataItem>();
+    public Dictionary<EItemType, DataItem> pDicItems_Type { private set; get; } = new Dictionary<EItemType, DataItem>();
 
-    public Dictionary<int, DataArmor> pDicArmors { private set; get; }
+    public Dictionary<int, DataArmor> pDicArmors { private set; get; } = new Dictionary<int, DataArmor>();
 
-    public Dictionary<int, DataWeapon> pDicWeapons { private set; get; }
+    public Dictionary<int, DataWeapon> pDicWeapons { private set; get; } = new Dictionary<int, DataWeapon>();
 
 
     /// <summary>
@@ -176,7 +177,8 @@ public class GameData_Inventory
     public void Init(ServerPlayerItemData[] items, ServerPlayerArmorData[] armors, ServerPlayerWeaponData[] weapons)
     {
         //
-        pDicItems ??= new Dictionary<EItemType, DataItem>();
+        pDicItems ??= new Dictionary<int, DataItem>();
+        pDicItems_Type ??= new Dictionary<EItemType, DataItem>();
 
         pDicItems.Clear();
 
@@ -190,8 +192,13 @@ public class GameData_Inventory
 
                 var temp = new DataItem(item.quantity, tableInfo);
 
-                if (pDicItems.ContainsKey(temp.pTableInfo.type) == false)
-                    pDicItems.Add(temp.pTableInfo.type, temp);
+                //
+                if (pDicItems.ContainsKey(temp.pTableInfo.key) == false)
+                    pDicItems.Add(temp.pTableInfo.key, temp);
+
+                //
+                if (pDicItems_Type.ContainsKey(temp.pTableInfo.type) == false)
+                    pDicItems_Type.Add(temp.pTableInfo.type, temp);
             }
         }
 
@@ -243,7 +250,7 @@ public class GameData_Inventory
     public DataItem GetDataItem(EItemType itemType)
     {
         //
-        if (pDicItems.ContainsKey(itemType) == false)
+        if (pDicItems_Type.ContainsKey(itemType) == false)
         {
             //
             var tableInfo = Manager_Table.Instance.GetItemInfo(itemType);
@@ -251,11 +258,11 @@ public class GameData_Inventory
                 return null;
 
             //
-            pDicItems.Add(itemType, new DataItem(0, tableInfo));
+            pDicItems_Type.Add(itemType, new DataItem(0, tableInfo));
         }
 
         //
-        return pDicItems[itemType];
+        return pDicItems_Type[itemType];
     }
 
     /// <summary>
@@ -271,7 +278,7 @@ public class GameData_Inventory
             return false;
 
         //
-        var dicItem = GameData.Instance.pDataInventory.pDicItems;
+        var dicItem = GameData.Instance.pDataInventory.pDicItems_Type;
         if (dicItem.ContainsKey(itemType))
         {
             if (dicItem[itemType].pCount >= count)

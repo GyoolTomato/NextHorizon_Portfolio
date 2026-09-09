@@ -4,11 +4,11 @@ namespace Observer
 {
     public readonly struct LoginResponseParsedEvent : IObserverEvent
     {
-        public ServerLoginResponse Response { get; }
+        public ServerLoginResponse Data { get; }
 
-        public LoginResponseParsedEvent(ServerLoginResponse response)
+        public LoginResponseParsedEvent(ServerLoginResponse data)
         {
-            Response = response;
+            Data = data;
         }
     }
 
@@ -19,6 +19,7 @@ namespace Observer
         public ServerPlayerCharacterData[] Characters => User?.characters ?? Array.Empty<ServerPlayerCharacterData>();
         public ServerPlayerArmorData[] Armors => User?.armors ?? Array.Empty<ServerPlayerArmorData>();
         public ServerPlayerWeaponData[] Weapons => User?.weapons ?? Array.Empty<ServerPlayerWeaponData>();
+        public ServerMissionData[] Missions => User?.missions ?? Array.Empty<ServerMissionData>();
 
         public LoginSucceededEvent(ServerUserData user)
         {
@@ -29,24 +30,72 @@ namespace Observer
     public readonly struct NewUserRequiredEvent : IObserverEvent
     {
         public string LocalId { get; }
-        public string FirebaseUid { get; }
 
-        public NewUserRequiredEvent(string localId, string firebaseUid)
+        public NewUserRequiredEvent(string localId)
         {
             LocalId = localId;
-            FirebaseUid = firebaseUid;
         }
     }
 
     public readonly struct NicknameChangedEvent : IObserverEvent
     {
-        public int UserId { get; }
+        public string Uid { get; }
         public string Nickname { get; }
 
-        public NicknameChangedEvent(int userId, string nickname)
+        public NicknameChangedEvent(string uid, string nickname)
         {
-            UserId = userId;
+            Uid = uid;
             Nickname = nickname;
+        }
+    }
+
+    public readonly struct FirebaseLinkedEvent : IObserverEvent
+    {
+        public ServerUserData Data { get; }
+
+        public FirebaseLinkedEvent(ServerUserData data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct PlayerInfoReceivedEvent : IObserverEvent
+    {
+        public ServerPlayerInfoData Data { get; }
+
+        public PlayerInfoReceivedEvent(ServerPlayerInfoData data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct IntroductionChangedEvent : IObserverEvent
+    {
+        public ServerPlayerInfoData Data { get; }
+
+        public IntroductionChangedEvent(ServerPlayerInfoData data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct PortraitChangedEvent : IObserverEvent
+    {
+        public ServerPlayerInfoData Data { get; }
+
+        public PortraitChangedEvent(ServerPlayerInfoData data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct ServerErrorParsedEvent : IObserverEvent
+    {
+        public ServerAPIError Data { get; }
+
+        public ServerErrorParsedEvent(ServerAPIError data)
+        {
+            Data = data;
         }
     }
 
@@ -62,71 +111,71 @@ namespace Observer
 
     public readonly struct ItemListReceivedEvent : IObserverEvent
     {
-        public ServerPlayerItemData[] Items { get; }
+        public ServerPlayerItemData[] Data { get; }
 
-        public ItemListReceivedEvent(ServerPlayerItemData[] items)
+        public ItemListReceivedEvent(ServerPlayerItemData[] data)
         {
-            Items = items;
+            Data = data;
         }
     }
 
     public readonly struct ArmorListReceivedEvent : IObserverEvent
     {
-        public ServerPlayerArmorData[] Armors { get; }
+        public ServerPlayerArmorData[] Data { get; }
 
-        public ArmorListReceivedEvent(ServerPlayerArmorData[] armors)
+        public ArmorListReceivedEvent(ServerPlayerArmorData[] data)
         {
-            Armors = armors;
+            Data = data;
         }
     }
 
     public readonly struct WeaponListReceivedEvent : IObserverEvent
     {
-        public ServerPlayerWeaponData[] Weapons { get; }
+        public ServerPlayerWeaponData[] Data { get; }
 
-        public WeaponListReceivedEvent(ServerPlayerWeaponData[] weapons)
+        public WeaponListReceivedEvent(ServerPlayerWeaponData[] data)
         {
-            Weapons = weapons;
+            Data = data;
         }
     }
 
     public readonly struct ArmorEquippedEvent : IObserverEvent
     {
-        public ServerPlayerArmorData Armor { get; }
+        public ServerPlayerArmorData Data { get; }
 
-        public ArmorEquippedEvent(ServerPlayerArmorData armor)
+        public ArmorEquippedEvent(ServerPlayerArmorData data)
         {
-            Armor = armor;
+            Data = data;
         }
     }
 
     public readonly struct WeaponEquippedEvent : IObserverEvent
     {
-        public ServerPlayerWeaponData Weapon { get; }
+        public ServerPlayerWeaponData Data { get; }
 
-        public WeaponEquippedEvent(ServerPlayerWeaponData weapon)
+        public WeaponEquippedEvent(ServerPlayerWeaponData data)
         {
-            Weapon = weapon;
+            Data = data;
         }
     }
 
     public readonly struct ArmorReleasedEvent : IObserverEvent
     {
-        public ServerPlayerArmorData Armor { get; }
+        public ServerPlayerArmorData Data { get; }
 
-        public ArmorReleasedEvent(ServerPlayerArmorData armor)
+        public ArmorReleasedEvent(ServerPlayerArmorData data)
         {
-            Armor = armor;
+            Data = data;
         }
     }
 
     public readonly struct WeaponReleasedEvent : IObserverEvent
     {
-        public ServerPlayerWeaponData Weapon { get; }
+        public ServerPlayerWeaponData Data { get; }
 
-        public WeaponReleasedEvent(ServerPlayerWeaponData weapon)
+        public WeaponReleasedEvent(ServerPlayerWeaponData data)
         {
-            Weapon = weapon;
+            Data = data;
         }
     }
 
@@ -142,41 +191,61 @@ namespace Observer
 
     public readonly struct CharacterListReceivedEvent : IObserverEvent
     {
-        public ServerPlayerCharacterData[] Characters { get; }
+        public ServerPlayerCharacterData[] Data { get; }
 
-        public CharacterListReceivedEvent(ServerPlayerCharacterData[] characters)
+        public CharacterListReceivedEvent(ServerPlayerCharacterData[] data)
         {
-            Characters = characters;
+            Data = data;
         }
     }
 
     public readonly struct CharacterUpgradedEvent : IObserverEvent
     {
-        public ServerPlayerCharacterData Character { get; }
+        public ServerPlayerCharacterData Data { get; }
 
-        public CharacterUpgradedEvent(ServerPlayerCharacterData character)
+        public CharacterUpgradedEvent(ServerPlayerCharacterData data)
         {
-            Character = character;
+            Data = data;
         }
     }
 
     public readonly struct CharacterLevelUpEvent : IObserverEvent
     {
-        public ServerCharacterLevelUpResponse Character { get; }
+        public ServerCharacterLevelUpResponse Data { get; }
 
-        public CharacterLevelUpEvent(ServerCharacterLevelUpResponse character)
+        public CharacterLevelUpEvent(ServerCharacterLevelUpResponse data)
         {
-            Character = character;
+            Data = data;
         }
     }
 
     public readonly struct VersionReceivedEvent : IObserverEvent
     {
-        public ServerVersionResponse Version { get; }
+        public ServerVersionResponse Data { get; }
 
-        public VersionReceivedEvent(ServerVersionResponse version)
+        public VersionReceivedEvent(ServerVersionResponse data)
         {
-            Version = version;
+            Data = data;
+        }
+    }
+
+    public readonly struct MissionListEvent : IObserverEvent
+    {
+        public ServerMissionListResponse Data { get; }
+
+        public MissionListEvent(ServerMissionListResponse data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct MissionClaimEvent:IObserverEvent
+    {
+        public ServerMissionClaimResponse Data { get; }
+
+        public MissionClaimEvent(ServerMissionClaimResponse data)
+        {
+            Data = data;
         }
     }
 }

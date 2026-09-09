@@ -10,6 +10,9 @@ public partial class ServerAPI : MonoBehaviour
     private static ServerAPI _instance;
 
     //
+    private int _activeRequestCount;
+
+    //
     public static ServerAPI Instance
     {
         get
@@ -51,6 +54,12 @@ public partial class ServerAPI : MonoBehaviour
         StartCoroutine(CoSendJson(path, method, json, onSuccess, onFailure));
     }
 
+    private void ParseResponse(string json, Func<string, bool> parser, Action<bool> onSuccess)
+    {
+        bool success = parser(json);
+        onSuccess?.Invoke(success);
+    }
+
     private IEnumerator CoSendJson(
         string path,
         string method,
@@ -58,74 +67,101 @@ public partial class ServerAPI : MonoBehaviour
         Action<string> onSuccess,
         Action<ServerAPIError> onFailure)
     {
-        //
-        ServerAPIError lastError = new ServerAPIError
-        {
-            message = "서버 주소가 설정되지 않았습니다."
-        };
+        LockTouch();
 
-        //
-        string[] serverAddresses = ProgramSettings.Instance.pServerAddresses;
-        if (serverAddresses == null || serverAddresses.Length == 0)
-        {
-            onFailure?.Invoke(lastError);
-
-            //
-            yield break;
-        }
-
-        for (int i = 0; i < serverAddresses.Length; i++)
+        try
         {
             //
-            string serverAddress = ProgramSettings.Instance.GetServerAddress(i);
-            if (string.IsNullOrWhiteSpace(serverAddress))
+            ServerAPIError lastError = new ServerAPIError
             {
-                continue;
-            }
+                message = "서버 주소가 설정되지 않았습니다."
+            };
 
             //
-            string url = $"{serverAddress}{path}";
-
-            //
-            using UnityWebRequest request = new UnityWebRequest(url, method);
-            request.timeout = 5;
-            if (!string.IsNullOrEmpty(json))
+            string[] serverAddresses = ProgramSettings.Instance.pServerAddresses;
+            if (serverAddresses == null || serverAddresses.Length == 0)
             {
-                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
-            }
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            //
-            yield return request.SendWebRequest();
-
-            //
-            string response = request.downloadHandler?.text ?? string.Empty;
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                onSuccess?.Invoke(response);
+                onFailure?.Invoke(lastError);
 
                 //
                 yield break;
             }
 
-            lastError.statusCode = request.responseCode;
-            lastError.message = request.error;
-            Parse_Error(response, lastError);
-
-            Debug.LogError($"서버 요청 실패: {method} {url}, 상태 코드: {request.responseCode}, 오류: {lastError.message}, 응답: {response}");
-
-            // 연결 자체에 실패한 경우에만 다음 서버를 시도한다.
-            // 4xx/5xx 응답은 서버에 도달한 것이므로 재시도하지 않는다.
-            if (request.result != UnityWebRequest.Result.ConnectionError)
+            for (int i = 0; i < serverAddresses.Length; i++)
             {
-                break;
+                //
+                string serverAddress = ProgramSettings.Instance.GetServerAddress(i);
+                if (string.IsNullOrWhiteSpace(serverAddress))
+                {
+                    continue;
+                }
+
+                //
+                string url = $"{serverAddress}{path}";
+
+                //
+                using UnityWebRequest request = new UnityWebRequest(url, method);
+                request.timeout = 5;
+                if (!string.IsNullOrEmpty(json))
+                {
+                    request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
+                }
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+
+                //
+                yield return request.SendWebRequest();
+
+                //
+                string response = request.downloadHandler?.text ?? string.Empty;
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    onSuccess?.Invoke(response);
+
+                    //
+                    yield break;
+                }
+
+                lastError.statusCode = request.responseCode;
+                lastError.message = request.error;
+                Parse_Error(response, lastError);
+
+                Debug.LogError($"서버 요청 실패: {method} {url}, 상태 코드: {request.responseCode}, 오류: {lastError.message}, 응답: {response}");
+
+                // 연결 자체에 실패한 경우에만 다음 서버를 시도한다.
+                // 4xx/5xx 응답은 서버에 도달한 것이므로 재시도하지 않는다.
+                if (request.result != UnityWebRequest.Result.ConnectionError)
+                {
+                    break;
+                }
+
+                Debug.LogWarning($"서버 접속 실패 ({i + 1}/{serverAddresses.Length}): {url}");
             }
 
-            Debug.LogWarning($"서버 접속 실패 ({i + 1}/{serverAddresses.Length}): {url}");
+            onFailure?.Invoke(lastError);
         }
+        finally
+        {
+            UnlockTouch();
+        }
+    }
 
-        onFailure?.Invoke(lastError);
+    private void LockTouch()
+    {
+        _activeRequestCount++;
+        if (_activeRequestCount == 1)
+        {
+            Manager_UI.Instance.ShowTouchLock();
+        }
+    }
+
+    private void UnlockTouch()
+    {
+        _activeRequestCount = Mathf.Max(0, _activeRequestCount - 1);
+        if (_activeRequestCount == 0)
+        {
+            Manager_UI.Instance.HideTouchLock();
+        }
     }
 
     private bool Parse_Error(string json, ServerAPIError error)
@@ -140,6 +176,13 @@ public partial class ServerAPI : MonoBehaviour
 
         //
         error.message = response.error;
+
+        //
+        var packet = new Observer.ServerErrorParsedEvent(error);
+
+        //
+        Observer.ObserverTracker<Observer.ServerErrorParsedEvent>.Instance.Broadcast(packet);
+
         return true;
     }
 }
