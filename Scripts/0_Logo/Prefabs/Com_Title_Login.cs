@@ -85,14 +85,14 @@ public class Com_Title_Login : Com_Base
     /// <returns></returns>
     public EState GetCurrentLogInType()
     {
-        if (_auth != null && _auth.CurrentUser != null && !_auth.CurrentUser.IsAnonymous)
-        {
-            return EState.LogIn_Google;
-        }
-
         if (IsGuestLoginSaved())
         {
             return EState.LogIn_Guest;
+        }
+
+        if (_auth != null && _auth.CurrentUser != null && !_auth.CurrentUser.IsAnonymous)
+        {
+            return EState.LogIn_Google;
         }
 
         return EState.None;
@@ -133,7 +133,8 @@ public class Com_Title_Login : Com_Base
 
         if (_txtLogInType.gameObject.activeSelf)
         {
-            _txtLogInType.text = state == EState.LogIn_Guest ? "Guest Log In" : "Google Log In";
+            var loginState = state == EState.Loading ? GetCurrentLogInType() : state;
+            _txtLogInType.text = loginState == EState.LogIn_Guest ? "Guest Log In" : "Google Log In";
         }
         
         if (_txtMessage.gameObject.activeSelf)

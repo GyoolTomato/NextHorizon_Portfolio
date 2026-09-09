@@ -81,6 +81,7 @@ public class Panel_PlayerInfo : Panel_Base,
         GD_playerInfo ??= GD.pPlayerInfo;
 
         //        
+        _isEditMode = false;
         _btnEdit.SetActive(true);
         _btnEdit.SetBtn(() =>
         {
