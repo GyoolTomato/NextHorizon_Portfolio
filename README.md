@@ -1,15 +1,10 @@
 # NextHorizon
 
-Unity로 개발한 모바일 수집형 RPG 프로젝트입니다.
+기획부터 Unity 클라이언트, 서버 API, 데이터 제작 도구까지 직접 설계하고 구현한 모바일 수집형 RPG 프로젝트입니다.
 
 [📱 Android APK 다운로드 (v1.0.0)](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v1.0.0)
 
-라이브 서비스형 게임의 클라이언트 구조를 경험하기 위해 인증, 원격 리소스 관리, 데이터 테이블, 다국어 UI와 캐릭터 정보 화면을 구현했습니다.
-
-> 이 저장소는 포트폴리오 검토를 위한 C# 코드 저장소입니다.  
-> 서버, 인증 설정, 원본 에셋 및 Unity 프로젝트 전체는 포함하지 않습니다.
-
-![NextHorizon 시연](Images/demo.gif)
+단순한 화면 구현에 그치지 않고 인증, 서버 데이터 연동, 원격 리소스 관리, 데이터 테이블 자동화와 다국어 UI를 하나의 실행 흐름으로 연결했습니다.
 
 ## 프로젝트 개요
 
@@ -18,18 +13,71 @@ Unity로 개발한 모바일 수집형 RPG 프로젝트입니다.
 | 장르 | 모바일 수집형 RPG |
 | 개발 환경 | Unity, C# |
 | 개발 인원 | 1인 개발 |
-| 담당 업무 | 프로젝트 기획, 클라이언트 개발, UI 및 시스템 구현 전반 |
+| 담당 업무 | 기획, Unity 클라이언트, UI, 서버 API, DB 구조 및 데이터 제작 도구 개발 |
 
-## 구현 기능
+## 프로젝트 핵심 요약
 
-- Firebase Authentication 기반 Google 및 익명 로그인
-- REST API를 이용한 사용자 데이터 조회
-- Addressables 카탈로그 갱신 및 추가 리소스 다운로드
-- 캐릭터 목록 및 능력치·스킬 상세 패널
-- 미션, 공지, 상점 및 가챠 UI
-- JSON 테이블 기반 콘텐츠 데이터 관리
-- 한국어·영어·일본어 실시간 언어 변경
-- FSM 기반 초기화 및 씬 상태 전환
+| 항목 | 요약 |
+|---|---|
+| 프로젝트 | 라이브 서비스 구조를 목표로 제작한 Unity 모바일 수집형 RPG |
+| 개발 범위 | 기획, Unity 클라이언트, UI, 서버 API, DB, 데이터 제작 도구를 혼자 설계·구현 |
+| 핵심 구현 | Google·Guest 로그인, 서버 데이터 연동, Addressables, 캐릭터·인벤토리·성장·미션, 다국어 UI |
+| 기술적 강점 | 클라이언트·서버·Excel 테이블을 연결하고 반복 데이터 생성을 전용 도구로 자동화 |
+| AI 활용 | Codex를 변경 영향 분석, 디버깅, 리팩터링 검토와 코드 리뷰에 활용 |
+| 구현 규모 | 데이터 테이블 모델 20개, 클라이언트 API 요청 메서드 27개, 지원 언어 3개 |
+| 결과물 | Android APK, 포트폴리오용 C# 코드, Excel 원본 데이터, WinForms 테이블 변환 도구 |
+
+빠르게 확인하기:
+
+- [Android APK 실행](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v1.0.0)
+- [핵심 구현 설명](#핵심-구현)
+- [직접 수행한 작업](#직접-수행한-작업)
+- [대표 문제 해결 사례](#대표-문제-해결-사례)
+- [Codex 활용과 AI 협업 경험](#codex-활용과-ai-협업-경험)
+
+![NextHorizon 시연](Images/demo.gif)
+
+## 직접 수행한 작업
+
+프로젝트의 요구사항 정의와 구조 설계부터 실제 구현 및 디버깅까지 전 과정을 직접 담당했습니다.
+
+- Unity 프로젝트 구조와 로고·다운로드·로그인·로비 상태 흐름 설계
+- Firebase Authentication 및 Google Sign-In 연동
+- REST API 요청·응답 모델과 클라이언트 데이터 초기화 구조 구현
+- Node.js 서버 API와 SQLite·Prisma 기반 사용자 데이터 구조 구현
+- Addressables 원격 카탈로그 확인, 추가 다운로드 및 리소스 캐싱 구현
+- 캐릭터, 인벤토리, 장비, 성장, 미션 및 플레이어 정보 UI 구현
+- Excel 원본 데이터를 Unity용 JSON·C# 코드로 변환하는 WinForms 도구 개발
+- 한국어·영어·일본어 데이터 테이블과 런타임 언어 변경 기능 구현
+- 오류 재현, 로그 분석, 코드 수정 및 실제 실행 결과 검증
+
+관련 저장소:
+
+- [NextHorizonTables](https://github.com/GyoolTomato/NextHorizonTables): Excel 기반 원본 게임 데이터
+- [TableDataConverter](https://github.com/GyoolTomato/TableDataConverter): Unity 테이블 및 C# 코드 생성 도구
+
+## 대표 문제 해결 사례
+
+| 문제 | 해결 | 결과 |
+|---|---|---|
+| 앱 업데이트마다 리소스를 다시 포함해야 하는 구조 | Addressables 원격 카탈로그 확인, 다운로드 용량 안내, 비동기 다운로드 및 캐싱 흐름 구현 | 앱 실행 중 필요한 리소스를 확인하고 추가 데이터만 내려받는 구조 구성 |
+| Excel 데이터 변경 때 JSON과 C# 모델을 반복해서 작성하는 작업 | Excel 규칙을 정의하고 `.bytes`, 데이터 클래스, enum 및 로더 코드를 생성하는 WinForms 도구 개발 | 원본 데이터와 런타임 산출물의 생성 과정을 자동화하고 수작업 범위 축소 |
+| 로그인 이후 여러 종류의 플레이어 데이터를 일관되게 초기화해야 하는 문제 | 서버 응답 모델을 통합하고 사용자·캐릭터·인벤토리·미션 데이터를 기능별 GameData로 분리 | 로그인부터 로비 진입까지 동일한 서버 데이터를 기준으로 초기화 |
+| 클라이언트와 서버 변경이 여러 저장소에 걸쳐 영향을 주는 문제 | Codex로 변경 범위와 누락 가능성을 분석하고 실제 코드·로그·실행 결과를 직접 대조 | 수정 대상을 빠르게 좁히고 제안의 적용 여부를 검증한 뒤 반영 |
+
+## Codex 활용과 AI 협업 경험
+
+Codex를 활용해 여러 저장소의 변경 영향을 빠르게 분석하고, 구현 과정에서 놓치기 쉬운 문제와 개선 가능성을 폭넓게 점검했습니다.
+
+주요 활용 범위:
+
+- 여러 저장소에 걸친 클라이언트·서버·테이블 변경 영향 분석
+- 네트워크 요청, 데이터 동기화 및 비동기 실행 흐름의 문제 추적
+- 반복 코드와 책임이 섞인 구조의 리팩터링 대안 검토
+- 변경 코드 리뷰, 누락된 예외 처리 탐색 및 테스트 항목 정리
+- 릴리즈별 변경사항 비교와 릴리즈 노트 초안 작성
+
+AI의 제안은 현재 구조와 데이터 흐름에 맞는지 직접 검토한 뒤 적용 여부를 결정했습니다. 최종 설계 선택, 코드 수정, 실행 검증과 결과에 대한 책임은 개발자인 제가 맡았습니다. 이 과정을 통해 문제와 제약 조건을 명확히 전달하고, 결과를 비판적으로 검토하며, 작업을 검증 가능한 단위로 나누는 AI 협업 방식을 익혔습니다.
 
 ## 실행 흐름
 
@@ -42,7 +90,7 @@ flowchart LR
     E -- "예" --> F["사용자 동의 및 다운로드"]
     E -- "아니요" --> G["리소스 초기화"]
     F --> G
-    G --> H["Firebase 로그인"]
+    G --> H["Google 또는 Guest 로그인"]
     H --> I["사용자 데이터 조회"]
     I --> J["게임 데이터 초기화"]
     J --> K["메인 로비"]
@@ -78,7 +126,7 @@ flowchart LR
 
 ### 2. 인증 및 사용자 데이터 연동
 
-Firebase Authentication과 Google Sign-In을 사용하여 Google 로그인과 익명 로그인을 구현했습니다. 인증에 성공하면 UID를 이용해 서버에 사용자 데이터를 요청하고, 응답 결과로 플레이어 데이터를 초기화한 뒤 게임 씬으로 이동합니다.
+Firebase Authentication과 Google Sign-In을 사용하는 Google 로그인과 기기 로컬 ID를 사용하는 Guest 로그인을 구현했습니다. 인증에 성공하면 UID를 이용해 서버에 사용자 데이터를 요청하고, 응답 결과로 플레이어 데이터를 초기화한 뒤 게임 씬으로 이동합니다.
 
 ![Google 및 Guest 로그인 선택 화면](Images/login-options.jpg)
 
@@ -89,7 +137,7 @@ Firebase Authentication과 Google Sign-In을 사용하여 Google 로그인과 �
 주요 처리:
 
 - Firebase 의존성 확인 및 인증 초기화
-- Google 로그인과 익명 로그인 분기
+- Google 로그인과 Guest 로그인 분기
 - 로그인 취소 및 실패 예외 처리
 - 로그인 진행 상태를 UI에 반영
 - REST API 응답을 전역 플레이어 데이터로 변환
@@ -98,7 +146,7 @@ Firebase Authentication과 Google Sign-In을 사용하여 Google 로그인과 �
 
 - [Com_Title_Login.cs](Scripts/0_Logo/Prefabs/Com_Title_Login.cs)
 - [LogoState_LogIn.cs](Scripts/0_Logo/FSM/LogoState_LogIn.cs)
-- [GlobalData_PlayerInfo.cs](Scripts/_Common/GlobalData/GlobalData_PlayerInfo.cs)
+- [GameData_PlayerInfo.cs](Scripts/1_Game/GameData/GameData_PlayerInfo.cs)
 
 ### 3. 공통 UI 구조
 
@@ -200,17 +248,19 @@ Excel의 2행은 변수명, 3행은 자료형, 4행부터는 실제 데이터로
 - [GameScene.cs](Scripts/1_Game/GameScene.cs)
 - [GameState.cs](Scripts/1_Game/FSM/GameState.cs)
 
-## 기술 스택
+## 사용 기술
 
-| 분류 | 기술 |
-|---|---|
-| Engine | Unity |
-| Language | C# |
-| Resource | Unity Addressables |
-| Authentication | Firebase Authentication, Google Sign-In |
-| Data | Excel, ClosedXML, Newtonsoft.Json, REST API |
-| Tool | .NET 8 WinForms, TableDataConverter |
-| Async | MEC Coroutine |
+| 분류 | 기술 | 적용 범위 |
+|---|---|---|
+| Engine | Unity | 클라이언트 실행 구조, UI 및 콘텐츠 구현 |
+| Language | C# | Unity 클라이언트와 데이터 변환 도구 개발 |
+| Server | Node.js, Express | 인증·사용자·인벤토리·캐릭터·미션 REST API 구현 |
+| Database | SQLite, Prisma | 사용자 데이터 모델, 조회·갱신 및 트랜잭션 처리 |
+| Resource | Unity Addressables | 원격 카탈로그와 추가 리소스 다운로드·캐싱 |
+| Authentication | Firebase Authentication, Google Sign-In | Google 인증과 Guest 로그인 흐름 구성 |
+| Data | Excel, ClosedXML, Newtonsoft.Json | 원본 테이블 관리와 JSON·C# 산출물 생성 |
+| Tool | .NET 8 WinForms, TableDataConverter | 데이터 제작 파이프라인 자동화 |
+| Async | MEC Coroutine | 클라이언트 비동기 초기화와 다운로드 흐름 처리 |
 
 ## 폴더 구조
 
