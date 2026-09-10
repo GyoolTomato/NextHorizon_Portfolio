@@ -24,7 +24,7 @@
 | 핵심 구현 | Google·Guest 로그인, 서버 데이터 연동, Addressables, 캐릭터·인벤토리·성장·미션, 다국어 UI |
 | 기술적 강점 | 클라이언트·서버·Excel 테이블을 연결하고 반복 데이터 생성을 전용 도구로 자동화 |
 | AI 활용 | Codex를 변경 영향 분석, 디버깅, 리팩터링 검토와 코드 리뷰에 활용 |
-| 구현 규모 | 데이터 테이블 모델 20개, 클라이언트 API 요청 메서드 27개, 지원 언어 3개 |
+| 구현 규모 | 콘텐츠·성장·다국어 데이터 테이블 모델 20개, 인증·플레이어·인벤토리·미션 API 요청 메서드 27개, 지원 언어 3개 |
 | 결과물 | Android APK, 포트폴리오용 C# 코드, Excel 원본 데이터, WinForms 테이블 변환 도구 |
 
 빠르게 확인하기:
@@ -39,7 +39,7 @@
 
 ## 직접 수행한 작업
 
-프로젝트의 요구사항 정의와 구조 설계부터 실제 구현 및 디버깅까지 전 과정을 직접 담당했습니다.
+프로젝트의 요구사항 정의와 구조 설계, 구현 방향 결정, 코드 수정 및 실행 검증을 직접 담당했습니다.
 
 - Unity 프로젝트 구조와 로고·다운로드·로그인·로비 상태 흐름 설계
 - Firebase Authentication 및 Google Sign-In 연동
@@ -63,7 +63,7 @@
 | 앱 업데이트마다 리소스를 다시 포함해야 하는 구조 | Addressables 원격 카탈로그 확인, 다운로드 용량 안내, 비동기 다운로드 및 캐싱 흐름 구현 | 앱 실행 중 필요한 리소스를 확인하고 추가 데이터만 내려받는 구조 구성 |
 | Excel 데이터 변경 때 JSON과 C# 모델을 반복해서 작성하는 작업 | Excel 규칙을 정의하고 `.bytes`, 데이터 클래스, enum 및 로더 코드를 생성하는 WinForms 도구 개발 | 원본 데이터와 런타임 산출물의 생성 과정을 자동화하고 수작업 범위 축소 |
 | 로그인 이후 여러 종류의 플레이어 데이터를 일관되게 초기화해야 하는 문제 | 서버 응답 모델을 통합하고 사용자·캐릭터·인벤토리·미션 데이터를 기능별 GameData로 분리 | 로그인부터 로비 진입까지 동일한 서버 데이터를 기준으로 초기화 |
-| 클라이언트와 서버 변경이 여러 저장소에 걸쳐 영향을 주는 문제 | Codex로 변경 범위와 누락 가능성을 분석하고 실제 코드·로그·실행 결과를 직접 대조 | 수정 대상을 빠르게 좁히고 제안의 적용 여부를 검증한 뒤 반영 |
+| 플레이어 레벨과 미션 보상 추가로 클라이언트·서버·테이블 모델을 함께 변경해야 하는 상황 | Codex로 저장소별 영향 범위와 데이터 전달 경로를 분석한 뒤 코드·테이블·서버 응답을 직접 대조 | 누락된 변경 지점을 확인하고 로그인부터 보상 반영까지 데이터 흐름을 일관되게 연결 |
 
 ## Codex 활용과 AI 협업 경험
 
@@ -193,8 +193,7 @@ flowchart LR
 Excel의 2행은 변수명, 3행은 자료형, 4행부터는 실제 데이터로 정의합니다. 컨버터는 `_*.xlsx` 파일을 읽어 다음 산출물을 자동 생성합니다.
 
 - `Assets/Tables`: JSON 형식의 `.bytes` 데이터
-- `Assets/Scripts/_Common/Tables`: 테이블별 C# 클래스와 `TableDataLoader.cs`
-- `Assets/Scripts/_Common/GlobalData`: enum C# 코드
+- `Assets/Scripts/_Common/Tables`: 테이블별 데이터 클래스, enum 및 `TableDataLoader.cs`
 
 이 구조로 원본 데이터, 자동 생성 코드, 런타임 로딩 로직의 역할을 분리했습니다. 테이블 구조가 변경되어도 Excel과 컨버터를 기준으로 산출물을 다시 생성하므로 반복적인 클래스 작성과 데이터 입력 오류를 줄일 수 있습니다.
 
@@ -237,7 +236,70 @@ Excel의 2행은 변수명, 3행은 자료형, 4행부터는 실제 데이터로
 - [Panel_Settings.cs](Scripts/1_Game/Prefabs/Main/Panel_Settings.cs)
 - [TextSupport.cs](Scripts/_Common/Others/TextSupport.cs)
 
-### 6. FSM 기반 상태 관리
+### 6. 플레이어 정보 및 계정 성장
+
+서버에서 플레이어의 UID, 닉네임, 레벨, 경험치, 대표 캐릭터, 소개글과 계정 생성일을 불러와 플레이어 정보 패널에 표시합니다. 소개글과 대표 캐릭터를 변경하면 서버 응답을 현재 게임 데이터와 UI에 반영합니다.
+
+플레이어 경험치는 캐릭터 경험치와 별도로 관리하며, 플레이어 레벨 테이블을 기준으로 현재 경험치와 다음 레벨까지 필요한 경험치를 계산합니다.
+
+주요 처리:
+
+- 플레이어 정보 조회와 로컬 게임 데이터 초기화
+- 소개글 편집 및 서버 저장
+- 보유 캐릭터를 이용한 대표 캐릭터 선택
+- 플레이어 경험치와 레벨 진행도 표시
+- 계정 생성일 및 보유 캐릭터 수 표시
+- 서버 응답 이벤트를 이용한 패널 갱신
+
+관련 코드:
+
+- [Panel_PlayerInfo.cs](Scripts/1_Game/Prefabs/Main/Panel_PlayerInfo.cs)
+- [GameData_PlayerInfo.cs](Scripts/1_Game/GameData/GameData_PlayerInfo.cs)
+- [ServerAPI.PlayerInfo.cs](Scripts/_Common/ServerAPI/ServerAPI.PlayerInfo.cs)
+- [_108_PlayerLevel.cs](Scripts/_Common/Tables/_108_PlayerLevel.cs)
+
+### 7. 인벤토리 및 장비 동기화
+
+아이템, 방어구와 무기를 각각 구분해 관리하고 서버에서 받은 보유 데이터를 인벤토리 UI에 표시합니다. 장비의 고유 ID와 장착 캐릭터 정보를 함께 관리하여 캐릭터별 장착·해제 결과가 서버 데이터와 일치하도록 구성했습니다.
+
+주요 처리:
+
+- 아이템·방어구·무기 데이터 분리 및 키 기반 조회
+- 아이템 획득·소비·수량 변경 요청
+- 방어구와 무기 목록 조회
+- 캐릭터별 장비 장착 및 해제
+- 서버 응답을 인벤토리 데이터와 슬롯 UI에 반영
+- 동일한 장비 유형의 중복 장착 방지
+
+관련 코드:
+
+- [Manager_Inventory.cs](Scripts/1_Game/Manager/Manager_Inventory.cs)
+- [GameData_Inventory.cs](Scripts/1_Game/GameData/GameData_Inventory.cs)
+- [ServerAPI.Inventory.cs](Scripts/_Common/ServerAPI/ServerAPI.Inventory.cs)
+- [Com_Armor_Slot.cs](Scripts/1_Game/Prefabs/Inventory/Com_Armor_Slot.cs)
+- [Com_Weapon_Slot.cs](Scripts/1_Game/Prefabs/Inventory/Com_Weapon_Slot.cs)
+
+### 8. 서버 기반 미션 및 보상 처리
+
+미션의 진행도와 보상 수령 여부를 서버 데이터로 관리합니다. 미션 목록을 콘텐츠 테이블과 결합해 UI를 구성하고, 완료 조건을 충족한 미션의 보상을 요청하면 지급된 아이템과 플레이어 경험치를 현재 게임 데이터에 반영합니다.
+
+주요 처리:
+
+- 미션 테이블과 서버 진행 데이터 결합
+- 미션 종류와 갱신 주기별 데이터 분류
+- 진행도와 완료 여부에 따른 UI 상태 변경
+- 완료 미션의 보상 수령 요청
+- 지급 아이템과 플레이어 경험치 동기화
+- 보상 수령 완료 이벤트를 이용한 목록 및 메인 UI 갱신
+
+관련 코드:
+
+- [GameData_Missions.cs](Scripts/1_Game/GameData/GameData_Missions.cs)
+- [ServerAPI.Mission.cs](Scripts/_Common/ServerAPI/ServerAPI.Mission.cs)
+- [Panel_Missions.cs](Scripts/1_Game/Prefabs/Main/Panel_Missions.cs)
+- [Com_Missions_Slot.cs](Scripts/1_Game/Prefabs/Main/Com_Missions_Slot.cs)
+
+### 9. FSM 기반 상태 관리
 
 로고, 리소스 다운로드, 로그인 상태를 각각 분리하고 상태별 진입, 종료, 갱신 동작을 관리했습니다. 게임 씬에서도 같은 구조를 사용하여 로비와 플레이 상태의 전환 기반을 구성했습니다.
 
@@ -258,7 +320,8 @@ Excel의 2행은 변수명, 3행은 자료형, 4행부터는 실제 데이터로
 | Server | Node.js, Express | 인증·사용자·인벤토리·캐릭터·미션 REST API 구현 |
 | Database | SQLite, Prisma | 사용자 데이터 모델, 조회·갱신 및 트랜잭션 처리 |
 | Resource | Unity Addressables | 원격 카탈로그와 추가 리소스 다운로드·캐싱 |
-| Authentication | Firebase Authentication, Google Sign-In | Google 인증과 Guest 로그인 흐름 구성 |
+| Authentication | Firebase Authentication, Google Sign-In | Google 인증 및 Firebase ID 토큰 처리 |
+| Guest Account | Local ID, PlayerPrefs | Guest 계정 식별 및 로그인 상태 유지 |
 | Data | Excel, ClosedXML, Newtonsoft.Json | 원본 테이블 관리와 JSON·C# 산출물 생성 |
 | Tool | .NET 8 WinForms, TableDataConverter | 데이터 제작 파이프라인 자동화 |
 | Async | MEC Coroutine | 클라이언트 비동기 초기화와 다운로드 흐름 처리 |
