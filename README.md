@@ -35,7 +35,7 @@
 - [대표 문제 해결 사례](#대표-문제-해결-사례)
 - [Codex 활용과 AI 협업 경험](#codex-활용과-ai-협업-경험)
 
-![NextHorizon 시연](Images/demo.gif)
+![NextHorizon 시연](Images/demo-v1.0.1.gif)
 
 ## 직접 수행한 작업
 
