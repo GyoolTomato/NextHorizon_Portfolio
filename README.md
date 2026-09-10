@@ -2,7 +2,7 @@
 
 기획부터 Unity 클라이언트, 서버 API, 데이터 제작 도구까지 직접 설계하고 구현한 모바일 수집형 RPG 프로젝트입니다.
 
-[📱 Android APK 다운로드 (v1.0.0)](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v1.0.0)
+[📱 Android APK 다운로드 (v1.0.1)](https://github.com/GyoolTomato/NextHorizon_Portfolio/releases/tag/v1.0.1)
 
 단순한 화면 구현에 그치지 않고 인증, 서버 데이터 연동, 원격 리소스 관리, 데이터 테이블 자동화와 다국어 UI를 하나의 실행 흐름으로 연결했습니다.
 
