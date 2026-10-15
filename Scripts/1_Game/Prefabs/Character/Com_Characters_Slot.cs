@@ -11,28 +11,46 @@ public class Com_Characters_Slot : Com_Base
     [SerializeField] Image _image;
     [SerializeField] TextMeshProUGUI _name;
     [SerializeField] TextMeshProUGUI _value;
+    [SerializeField] GameObject _selectedFrame;
+
+    //    
+    Action<Com_Characters_Slot> _onBtnSlot = null;
 
     //
-    DataCharacter _character = null;
-    Action<DataCharacter> _onBtnSlot = null;
+    public DataCharacter pData = null;
 
-    //
-    public void Init(DataCharacter character, Panel_Characters.EViewMode viewMode, Action<DataCharacter> onBtnSlot)
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="character"></param>
+    /// <param name="viewMode"></param>
+    /// <param name="onBtnSlot"></param>
+    public void Init(DataCharacter character, Panel_Characters.EViewMode viewMode, Action<Com_Characters_Slot> onBtnSlot)
     {
         //
-        _character = character;
-        if (_character == null)
+        pData = character;
+        if (pData == null)
         {
             return;
         }
 
         //
         _onBtnSlot = onBtnSlot;
-        _image.sprite = Manager_Resources.Instance.GetCharacterSprite(ECharacterImageType.UpperBody, _character.pTableInfo.model);
+        _image.sprite = Manager_Resources.Instance.GetCharacterSprite(ECharacterImageType.UpperBody, pData.pTableInfo.model);
         //_image.SetNativeSize();
-        _name.text = Manager_UI.Instance.GetTextCharacter(_character.pTableInfo.name);
+        _name.text = Manager_UI.Instance.GetTextCharacter(pData.pTableInfo.name);
 
         SetValue(viewMode);
+        SetSelected(false);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void SetSelected(bool isSelected)
+    {
+        _selectedFrame.SetActive(isSelected);
     }
 
     /// <summary>
@@ -44,10 +62,10 @@ public class Com_Characters_Slot : Com_Base
         switch (viewMode)
         {
             case Panel_Characters.EViewMode.Level:
-                _value.text = string.Format("Lv. {0}", _character.pLevel);
+                _value.text = string.Format("Lv. {0}", pData.pLevel);
                 break;
             case Panel_Characters.EViewMode.Grade:
-                _value.text = string.Format("¡Ú {0}", _character.pGrade);
+                _value.text = string.Format("¡Ú {0}", pData.pGrade);
                 break;
             default:
                 break;
@@ -59,6 +77,6 @@ public class Com_Characters_Slot : Com_Base
     /// </summary>
     public void OnClick()
     {
-        _onBtnSlot?.Invoke(_character);
+        _onBtnSlot?.Invoke(this);
     }
 }

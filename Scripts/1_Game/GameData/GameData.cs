@@ -11,16 +11,19 @@ public class GameData : Singleton<GameData>
     public GameData_Inventory pDataInventory { private set; get; } = null;
     public GameData_Missions  pDataMissions  { private set; get; } = null;    
     public GameData_Shop      pDataShop      { private set; get; } = null;
+    public GameData_Stage     pDataStage     { private set; get; } = null;
+
 
 
     public void Init()
     {
         //
         pPlayerInfo    = new GameData_PlayerInfo();
-        pDataCharacter = new GameData_Character();
-        pDataGacha     = new GameData_Gacha    ();
-        pDataInventory = new GameData_Inventory();
-        pDataMissions  = new GameData_Missions ();
-        pDataShop      = new GameData_Shop     ();
+        pDataCharacter = new GameData_Character ();
+        pDataGacha     = new GameData_Gacha     ();
+        pDataInventory = new GameData_Inventory ();
+        pDataMissions  = new GameData_Missions  ();
+        pDataShop      = new GameData_Shop      ();
+        pDataStage     = new GameData_Stage     ();
     }
 }

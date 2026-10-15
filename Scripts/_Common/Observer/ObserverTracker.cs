@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Observer
 {
-    public class ObserverTracker<T> : Singleton<ObserverTracker<T>> where T : struct, IObserverEvent
+    public class ObserverTracker<T> : Singleton<ObserverTracker<T>>, IObserverTracker where T : struct, IObserverEvent
     {
         //
         readonly List<IObserver<T>> _list = new();
@@ -19,6 +19,9 @@ namespace Observer
             {
                 return;
             }
+
+            //
+            Manager_Observer.Instance.AddTracker(this);
 
             //
             _list.Add(observer);

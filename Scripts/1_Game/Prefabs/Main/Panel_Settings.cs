@@ -1,3 +1,4 @@
+using Observer;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -5,9 +6,15 @@ using UnityEngine.UI;
 public class Panel_Settings : Panel_Base
 {
     //
+    [Header("Language")]
     [SerializeField] GameObject _langKoreanCheck;
     [SerializeField] GameObject _langEnglishCheck;
     [SerializeField] GameObject _langJapaneseCheck;
+
+    //
+    [Header("Account")]
+    [SerializeField] Com_Button _comLogOut;
+
 
     /// <summary>
     /// 
@@ -32,6 +39,17 @@ public class Panel_Settings : Panel_Base
         _langKoreanCheck  .SetActive(language == ELanguage.Korean  );
         _langEnglishCheck .SetActive(language == ELanguage.English );
         _langJapaneseCheck.SetActive(language == ELanguage.Japanese);
+
+        //
+        _comLogOut.SetActive(true);
+        _comLogOut.SetBtn(() =>
+        {
+            Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextSystem(9990012), Manager_UI.Instance.GetTextSystem(9990013), Panel_MessageBox.EType.ConfirmCancel, () =>
+            {                
+                Manager_Account.Instance.LogOut();
+                GameManager.ChangeLogoScene();
+            });
+        });
     }
 
     /// <summary>

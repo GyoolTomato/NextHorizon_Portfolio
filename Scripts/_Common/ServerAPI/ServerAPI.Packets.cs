@@ -43,6 +43,7 @@ public class ServerUserData
     public ServerPlayerArmorData[] armors;
     public ServerPlayerWeaponData[] weapons;
     public ServerMissionData[] missions;
+    public ServerStageClearData[] stageClears;
 }
 
 [Serializable]
@@ -111,6 +112,8 @@ public class ServerPlayerArmorData
     public int armorKey;
     public int level;
     public int exp;
+    public string subStat0;
+    public string subStat1;
     public int equipedCharacter;
 }
 
@@ -122,7 +125,42 @@ public class ServerPlayerWeaponData
     public int weaponKey;
     public int level;
     public int exp;
+    public string subStat0;
+    public string subStat1;
     public int equipedCharacter;
+}
+
+[Serializable]
+public class ServerArmorEquipmentResponse
+{
+    public ServerPlayerArmorData equipped;
+    public ServerPlayerArmorData released;
+}
+
+[Serializable]
+public class ServerWeaponEquipmentResponse
+{
+    public ServerPlayerWeaponData equipped;
+    public ServerPlayerWeaponData released;
+}
+
+[Serializable]
+public class ServerEquipmentLevelUpRequest
+{
+    public string uid;
+    public int id;
+    public bool isArmor;
+    public EItemType[] eItemTypes;
+    public long[] counts;
+}
+
+[Serializable]
+public class ServerEquipmentLevelUpResponse
+{
+    public bool isArmor;
+    public ServerPlayerArmorData armor;
+    public ServerPlayerWeaponData weapon;
+    public ServerPlayerItemData[] items;
 }
 
 [Serializable]
@@ -130,6 +168,7 @@ public class ServerArmorEquipRequest
 {
     public string uid;
     public int characterKey;
+    public string type;
     public int id;
 }
 
@@ -138,13 +177,6 @@ public class ServerWeaponEquipRequest
 {
     public string uid;
     public int characterKey;
-    public int id;
-}
-
-[Serializable]
-public class ServerInventoryReleaseRequest
-{
-    public string uid;
     public int id;
 }
 
@@ -267,4 +299,29 @@ public class ServerMissionClaimResponse : ServerMissionListResponse
     public ServerMissionRewardData[] rewards;
     public ServerPlayerItemData[] items;
     public ServerPlayerExperienceData playerExperience;
+}
+
+[Serializable]
+public class ServerStageClearRequest
+{
+    public string uid;
+    public int stageKey;
+    public float clearTime;
+}
+
+[Serializable]
+public class ServerStageClearResponse
+{
+    public bool success;
+    public ServerPlayerArmorData[] armors;
+    public ServerPlayerWeaponData[] weapons;
+}
+
+[Serializable]
+public class ServerStageClearData
+{
+    public int stageKey;
+    public bool isCond1;
+    public bool isCond2;
+    public bool isCond3;
 }

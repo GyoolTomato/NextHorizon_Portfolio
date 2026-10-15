@@ -1,6 +1,8 @@
+using NUnit.Framework;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Collections.Generic;
 
 public partial class ServerAPI
 {
@@ -56,14 +58,28 @@ public partial class ServerAPI
 
         GameData.Instance.pDataMissions.pDicMissions[response.missionKey].SetClaimed(true);
 
+        //
+        var dataInventory = GameData.Instance.pDataInventory;        
         foreach (var item in response.items)
-        {
-            var dataInventory = GameData.Instance.pDataInventory;
+        {            
+            //
             if (dataInventory.pDicItems.ContainsKey(item.itemKey))
             {
-                dataInventory.pDicItems[item.itemKey].AddItemCount(item.quantity);
+                dataInventory.pDicItems[item.itemKey].SetItemCount(item.quantity);
             }
         }
+        
+        //
+        var dataItems = new List<DataItem>();
+        for (int i = 0; i < response.rewards.Length; i++)
+        {
+            var tableInfo = _101_Items.GetItem(response.rewards[i].itemKey);
+            if (tableInfo != null)
+                dataItems.Add(new DataItem(response.rewards[i].quantity, tableInfo));            
+        }
+
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.RewardBox) as Panel_RewardBox;
+        panel.Init(dataItems.ToArray(), null, null);
 
         //
         var packet = new Observer.MissionClaimEvent(response);

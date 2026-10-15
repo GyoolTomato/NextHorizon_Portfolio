@@ -1,18 +1,9 @@
-using Firebase;
-using Firebase.Auth;
-using Firebase.Extensions;
-using Google;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Com_Title_Login : Com_Base
 {
-    private const string GoogleWebClientId =
-        "693264845451-4019fn8u077jb0nl7jrq0t69ju7cbmnj.apps.googleusercontent.com";
-    private const string GuestLoginPreferenceKey = "NextHorizon.GuestLogin";
-
     //
     [SerializeField] GameObject _btnLogInGoogle;
     [SerializeField] GameObject _btnLogInGuest;
@@ -31,20 +22,15 @@ public class Com_Title_Login : Com_Base
     }
 
     //
-    EState               _state = EState.None;
-    private FirebaseAuth _auth;
-    private bool         _isInitialized = false;
-    private GoogleSignInConfiguration _googleSignInConfiguration;
+    EState _state = EState.None;
 
     /// <summary>
     /// 
     /// </summary>
     public void Init()
     {
+        //
         Debug.Log("Init start");
-
-        _isInitialized = false;
-        EnsureGoogleSignInConfiguration();
 
         _btnLogInGoogle.SetActive(false);
         _btnLogInGuest.SetActive(true);
@@ -53,29 +39,16 @@ public class Com_Title_Login : Com_Base
         _btnMessageForPlayGame.SetActive(false);
         _txtMessage.gameObject.SetActive(false);
 
-        SetState(IsGuestLoginSaved() ? EState.LogIn_Guest : EState.None);
-
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        //
+        SetState(GetCurrentLogInType());
+        Manager_Account.Instance.Init(success =>
         {
-            if (task.Result != DependencyStatus.Available)
+            if (success == false)
             {
-                Debug.LogError($"Firebase dependency error: {task.Result}");
                 return;
             }
 
-            FirebaseApp app = FirebaseApp.DefaultInstance;
-            _auth = FirebaseAuth.DefaultInstance;
-
-            if (_auth.CurrentUser != null && _auth.CurrentUser.IsAnonymous)
-            {
-                _auth.SignOut();
-            }
-
-            _isInitialized = true;
-
             SetState(GetCurrentLogInType());
-
-            Debug.Log("Firebase / GoogleSignIn initialized");
         });
     }
 
@@ -85,27 +58,15 @@ public class Com_Title_Login : Com_Base
     /// <returns></returns>
     public EState GetCurrentLogInType()
     {
-        if (IsGuestLoginSaved())
+        switch (Manager_Account.Instance.pLoginType)
         {
-            return EState.LogIn_Guest;
+            case Manager_Account.ELoginType.Guest:
+                return EState.LogIn_Guest;
+            case Manager_Account.ELoginType.Google:
+                return EState.LogIn_Google;
+            default:
+                return EState.None;
         }
-
-        if (_auth != null && _auth.CurrentUser != null && !_auth.CurrentUser.IsAnonymous)
-        {
-            return EState.LogIn_Google;
-        }
-
-        return EState.None;
-    }
-
-    private static bool IsGuestLoginSaved()
-        => PlayerPrefs.GetInt(GuestLoginPreferenceKey, 0) == 1;
-
-    private static void SaveGuestLogin(bool value)
-    {
-        if (value) PlayerPrefs.SetInt(GuestLoginPreferenceKey, 1);
-        else PlayerPrefs.DeleteKey(GuestLoginPreferenceKey);
-        PlayerPrefs.Save();
     }
 
     /// <summary>
@@ -133,7 +94,7 @@ public class Com_Title_Login : Com_Base
 
         if (_txtLogInType.gameObject.activeSelf)
         {
-            var loginState = state == EState.Loading ? GetCurrentLogInType() : state;
+            EState loginState = state == EState.Loading ? GetCurrentLogInType() : state;
             _txtLogInType.text = loginState == EState.LogIn_Guest ? "Guest Log In" : "Google Log In";
         }
         
@@ -148,15 +109,6 @@ public class Com_Title_Login : Com_Base
     /// </summary>
     public void OnBtnGoogleLogin()
     {
-#if UNITY_EDITOR
-        Debug.LogWarning(
-            "Google Sign-In is not supported in the Unity Editor. " +
-            "Build and run the app on an Android or iOS device.");
-        return;
-#elif !UNITY_ANDROID && !UNITY_IOS
-        Debug.LogWarning("Google Sign-In is only supported on Android and iOS.");
-        return;
-#else
         //
         if (_state != EState.None)
         {
@@ -164,97 +116,12 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        if (!_isInitialized)
+        Manager_Account.Instance.LogInGoogle(success =>
         {
-            Debug.LogError("Login system is not initialized yet.");
-            return;
-        }
-
-        try
-        {
-            EnsureGoogleSignInConfiguration();
-            GoogleSignIn.DefaultInstance.EnableDebugLogging(true);
-            Debug.Log($"Google Sign-In start: package={Application.identifier}, webClientId={GoogleSignIn.Configuration.WebClientId}");
-            GoogleSignIn.DefaultInstance.SignIn()
-                .ContinueWithOnMainThread(OnGoogleAuthFinished);
-        }
-        catch (System.Exception exception)
-        {
-            Debug.LogException(exception);
-        }
-#endif
-    }
-
-    private void EnsureGoogleSignInConfiguration()
-    {
-        _googleSignInConfiguration ??= new GoogleSignInConfiguration
-        {
-            WebClientId = GoogleWebClientId,
-            RequestIdToken = true,
-            RequestEmail = true
-        };
-
-        GoogleSignIn.Configuration = _googleSignInConfiguration;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="task"></param>
-    private void OnGoogleAuthFinished(Task<GoogleSignInUser> task)
-    {
-        if (task.IsCanceled)
-        {
-            Debug.LogError("Google Sign-In was canceled.");
-            return;
-        }
-
-        if (task.IsFaulted)
-        {
-            System.Exception innerException = task.Exception?.GetBaseException();
-            if (innerException is GoogleSignIn.SignInException signInException)
+            if (success)
             {
-                Debug.LogError(
-                    $"Google Sign-In error: status={signInException.Status}, " +
-                    $"message={signInException.Message}");
+                SetState(GetCurrentLogInType());
             }
-            else
-            {
-                Debug.LogError($"Google Sign-In error: {task.Exception}");
-            }
-            return;
-        }
-
-        GoogleSignInUser googleUser = task.Result;
-
-        if (googleUser == null || string.IsNullOrEmpty(googleUser.IdToken))
-        {
-            Debug.LogError("Google user or IdToken is null.");
-            return;
-        }
-
-        Credential credential = GoogleAuthProvider.GetCredential(googleUser.IdToken, null);
-
-        _auth.SignInWithCredentialAsync(credential).ContinueWithOnMainThread(authTask =>
-        {
-            if (authTask.IsCanceled)
-            {
-                Debug.LogError("SignInWithCredentialAsync was canceled.");
-                return;
-            }
-
-            if (authTask.IsFaulted)
-            {
-                Debug.LogError("SignInWithCredentialAsync encountered an error: " + authTask.Exception);
-                return;
-            }
-
-            FirebaseUser newUser = authTask.Result;
-            Debug.LogFormat("User signed in successfully: {0} ({1})",
-                newUser.DisplayName, newUser.UserId);
-
-            SaveGuestLogin(false);
-            SetState(GetCurrentLogInType());
         });
     }
 
@@ -270,9 +137,7 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        // Guest accounts no longer sign in to Firebase.
-        // _auth.SignInAnonymouslyAsync();
-        SaveGuestLogin(true);
+        Manager_Account.Instance.LogInGuest();
         SetState(EState.LogIn_Guest);
     }
 
@@ -288,18 +153,7 @@ public class Com_Title_Login : Com_Base
         }
 
         //
-        _auth?.SignOut();
-
-        //
-#if !UNITY_EDITOR
-        if (GoogleSignIn.Configuration != null)
-        {
-            GoogleSignIn.DefaultInstance.SignOut();
-        }
-#endif
-
-        //
-        SaveGuestLogin(false);
+        Manager_Account.Instance.LogOut(false);
         SetState(EState.None);
     }
 

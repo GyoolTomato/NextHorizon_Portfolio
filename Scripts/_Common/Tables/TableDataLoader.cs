@@ -25,6 +25,18 @@ namespace Data
         public List<_107_CharacterLevel.Values> _list_107_CharacterLevel = new List<_107_CharacterLevel.Values>();
         public Dictionary<int, _108_PlayerLevel.Values> _dic_108_PlayerLevel = new Dictionary<int, _108_PlayerLevel.Values>();
         public List<_108_PlayerLevel.Values> _list_108_PlayerLevel = new List<_108_PlayerLevel.Values>();
+        public Dictionary<int, _109_ArmorGroup.Values> _dic_109_ArmorGroup = new Dictionary<int, _109_ArmorGroup.Values>();
+        public List<_109_ArmorGroup.Values> _list_109_ArmorGroup = new List<_109_ArmorGroup.Values>();
+        public Dictionary<int, _110_WeaponGroup.Values> _dic_110_WeaponGroup = new Dictionary<int, _110_WeaponGroup.Values>();
+        public List<_110_WeaponGroup.Values> _list_110_WeaponGroup = new List<_110_WeaponGroup.Values>();
+        public Dictionary<int, _111_WeaponLevel.Values> _dic_111_WeaponLevel = new Dictionary<int, _111_WeaponLevel.Values>();
+        public List<_111_WeaponLevel.Values> _list_111_WeaponLevel = new List<_111_WeaponLevel.Values>();
+        public Dictionary<int, _112_ArmorLevel.Values> _dic_112_ArmorLevel = new Dictionary<int, _112_ArmorLevel.Values>();
+        public List<_112_ArmorLevel.Values> _list_112_ArmorLevel = new List<_112_ArmorLevel.Values>();
+        public Dictionary<int, _700_StageList.Values> _dic_700_StageList = new Dictionary<int, _700_StageList.Values>();
+        public List<_700_StageList.Values> _list_700_StageList = new List<_700_StageList.Values>();
+        public Dictionary<int, _701_Stage_1.Values> _dic_701_Stage_1 = new Dictionary<int, _701_Stage_1.Values>();
+        public List<_701_Stage_1.Values> _list_701_Stage_1 = new List<_701_Stage_1.Values>();
         public Dictionary<int, _800_Notice.Values> _dic_800_Notice = new Dictionary<int, _800_Notice.Values>();
         public List<_800_Notice.Values> _list_800_Notice = new List<_800_Notice.Values>();
         public Dictionary<int, _900_CommonText.Values> _dic_900_CommonText = new Dictionary<int, _900_CommonText.Values>();
@@ -43,6 +55,8 @@ namespace Data
         public List<_906_ArmorsText.Values> _list_906_ArmorsText = new List<_906_ArmorsText.Values>();
         public Dictionary<int, _907_WeaponsText.Values> _dic_907_WeaponsText = new Dictionary<int, _907_WeaponsText.Values>();
         public List<_907_WeaponsText.Values> _list_907_WeaponsText = new List<_907_WeaponsText.Values>();
+        public Dictionary<int, _908_StageText.Values> _dic_908_StageText = new Dictionary<int, _908_StageText.Values>();
+        public List<_908_StageText.Values> _list_908_StageText = new List<_908_StageText.Values>();
         public Dictionary<int, _999_SystemText.Values> _dic_999_SystemText = new Dictionary<int, _999_SystemText.Values>();
         public List<_999_SystemText.Values> _list_999_SystemText = new List<_999_SystemText.Values>();
 
@@ -103,6 +117,42 @@ namespace Data
                 _list_108_PlayerLevel.Add(item);
                 _dic_108_PlayerLevel.Add(item.key, item);
             }
+            var temp_109_ArmorGroup = JsonConvert.DeserializeObject<List<_109_ArmorGroup.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_109_ArmorGroup.bytes").text);
+            foreach (var item in temp_109_ArmorGroup)
+            {
+                _list_109_ArmorGroup.Add(item);
+                _dic_109_ArmorGroup.Add(item.key, item);
+            }
+            var temp_110_WeaponGroup = JsonConvert.DeserializeObject<List<_110_WeaponGroup.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_110_WeaponGroup.bytes").text);
+            foreach (var item in temp_110_WeaponGroup)
+            {
+                _list_110_WeaponGroup.Add(item);
+                _dic_110_WeaponGroup.Add(item.key, item);
+            }
+            var temp_111_WeaponLevel = JsonConvert.DeserializeObject<List<_111_WeaponLevel.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_111_WeaponLevel.bytes").text);
+            foreach (var item in temp_111_WeaponLevel)
+            {
+                _list_111_WeaponLevel.Add(item);
+                _dic_111_WeaponLevel.Add(item.key, item);
+            }
+            var temp_112_ArmorLevel = JsonConvert.DeserializeObject<List<_112_ArmorLevel.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_112_ArmorLevel.bytes").text);
+            foreach (var item in temp_112_ArmorLevel)
+            {
+                _list_112_ArmorLevel.Add(item);
+                _dic_112_ArmorLevel.Add(item.key, item);
+            }
+            var temp_700_StageList = JsonConvert.DeserializeObject<List<_700_StageList.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_700_StageList.bytes").text);
+            foreach (var item in temp_700_StageList)
+            {
+                _list_700_StageList.Add(item);
+                _dic_700_StageList.Add(item.key, item);
+            }
+            var temp_701_Stage_1 = JsonConvert.DeserializeObject<List<_701_Stage_1.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_701_Stage_1.bytes").text);
+            foreach (var item in temp_701_Stage_1)
+            {
+                _list_701_Stage_1.Add(item);
+                _dic_701_Stage_1.Add(item.key, item);
+            }
             var temp_800_Notice = JsonConvert.DeserializeObject<List<_800_Notice.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_800_Notice.bytes").text);
             foreach (var item in temp_800_Notice)
             {
@@ -156,6 +206,12 @@ namespace Data
             {
                 _list_907_WeaponsText.Add(item);
                 _dic_907_WeaponsText.Add(item.key, item);
+            }
+            var temp_908_StageText = JsonConvert.DeserializeObject<List<_908_StageText.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_908_StageText.bytes").text);
+            foreach (var item in temp_908_StageText)
+            {
+                _list_908_StageText.Add(item);
+                _dic_908_StageText.Add(item.key, item);
             }
         }
 

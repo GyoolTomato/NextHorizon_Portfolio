@@ -11,6 +11,10 @@ using UnityEngine.SceneManagement;
 public class LogoState_Download : LogoState
 {
     //
+    static bool _isInitAddressable = false;
+    static bool _isInitTableLoader = false;
+
+    //
     bool _isDone = false;
 
     //
@@ -32,8 +36,11 @@ public class LogoState_Download : LogoState
         //
         try
         {
-            Manager_Addressable.Instance.Init();
-
+            if (_isInitAddressable == false)
+            {
+                _isInitAddressable = true;
+                Manager_Addressable.Instance.Init();                
+            }
         }
         catch (System.Exception e)
         {
@@ -54,7 +61,11 @@ public class LogoState_Download : LogoState
         {
             _isDone = true;
 
-            TableDataLoader.Instance.Init();
+            if (_isInitTableLoader == false)
+            {
+                _isInitTableLoader = true;
+                TableDataLoader.Instance.Init();                
+            }            
 
             LogoScene.ChangeState(ELogoState.LogIn);
         }

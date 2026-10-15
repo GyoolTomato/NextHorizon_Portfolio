@@ -18,4 +18,12 @@ namespace Observer
     {
         void OnEvent(T message);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public interface IObserverTracker
+    {
+        void Clear();
+    }
 }

@@ -20,6 +20,7 @@ namespace Observer
         public ServerPlayerArmorData[] Armors => User?.armors ?? Array.Empty<ServerPlayerArmorData>();
         public ServerPlayerWeaponData[] Weapons => User?.weapons ?? Array.Empty<ServerPlayerWeaponData>();
         public ServerMissionData[] Missions => User?.missions ?? Array.Empty<ServerMissionData>();
+        public ServerStageClearData[] StageClears => User?.stageClears ?? Array.Empty<ServerStageClearData>();
 
         public LoginSucceededEvent(ServerUserData user)
         {
@@ -141,9 +142,9 @@ namespace Observer
 
     public readonly struct ArmorEquippedEvent : IObserverEvent
     {
-        public ServerPlayerArmorData Data { get; }
+        public ServerArmorEquipmentResponse Data { get; }
 
-        public ArmorEquippedEvent(ServerPlayerArmorData data)
+        public ArmorEquippedEvent(ServerArmorEquipmentResponse data)
         {
             Data = data;
         }
@@ -151,29 +152,19 @@ namespace Observer
 
     public readonly struct WeaponEquippedEvent : IObserverEvent
     {
-        public ServerPlayerWeaponData Data { get; }
+        public ServerWeaponEquipmentResponse Data { get; }
 
-        public WeaponEquippedEvent(ServerPlayerWeaponData data)
+        public WeaponEquippedEvent(ServerWeaponEquipmentResponse data)
         {
             Data = data;
         }
     }
 
-    public readonly struct ArmorReleasedEvent : IObserverEvent
+    public readonly struct EquipmentLevelUpEvent : IObserverEvent
     {
-        public ServerPlayerArmorData Data { get; }
+        public ServerEquipmentLevelUpResponse Data { get; }
 
-        public ArmorReleasedEvent(ServerPlayerArmorData data)
-        {
-            Data = data;
-        }
-    }
-
-    public readonly struct WeaponReleasedEvent : IObserverEvent
-    {
-        public ServerPlayerWeaponData Data { get; }
-
-        public WeaponReleasedEvent(ServerPlayerWeaponData data)
+        public EquipmentLevelUpEvent(ServerEquipmentLevelUpResponse data)
         {
             Data = data;
         }
@@ -244,6 +235,16 @@ namespace Observer
         public ServerMissionClaimResponse Data { get; }
 
         public MissionClaimEvent(ServerMissionClaimResponse data)
+        {
+            Data = data;
+        }
+    }
+
+    public readonly struct StageClearEvent : IObserverEvent
+    {
+        public ServerStageClearResponse Data { get; }
+
+        public StageClearEvent(ServerStageClearResponse data)
         {
             Data = data;
         }

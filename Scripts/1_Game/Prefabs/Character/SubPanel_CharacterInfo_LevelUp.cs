@@ -261,7 +261,7 @@ public class SubPanel_CharacterInfo_LevelUp : Com_Slots<Com_Item_Slot>
     /// <summary>
     /// 
     /// </summary>
-    void OnBtnLevelUp()
+    public void OnBtnLevelUp()
     {
         var eItemTypes = new List<EItemType>();
         var counts = new List<long>();

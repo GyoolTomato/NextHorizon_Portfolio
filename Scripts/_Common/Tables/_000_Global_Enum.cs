@@ -35,29 +35,32 @@ public enum EGameState
 public enum EPanelType
 {
     None,
+    Board_0,
     Title,
     Main,
     Characters,
     Gacha,
-    Formation,
     Inventory,
     Shop,
     Mail,
     LobbyCharacter,
     Missions,
-    Works,
+    StageSelect,
+    Formation,
     Notice,
     PlayerInfo,
     CharacterInfo,
-    PopUpInfo,
     CharacterSelect,
+    WearEquipment,
+    LevelUp,
     Settings,
+    Board_1,
+    RewardBox,
+    PopUpInfo,
     MessageBox,
     Flash,
+    Board_2,
     TouchLock,
-    Group_0,
-    Group_1,
-    Group_2,
     End
 }
 
@@ -68,6 +71,7 @@ public enum EItemType
     Gold,
     PlayerExp,
     ExpCard,
+    ReinforcementCard,
     End
 }
 
@@ -97,11 +101,12 @@ public enum ECharacterState
     End
 }
 
-public enum EArmorType
+public enum EEquipmentType
 {
     None,
-    Shirt,
-    Pants,
+    Weapon,
+    Hat,
+    Clothes,
     Gloves,
     Shoes,
     End
@@ -188,5 +193,23 @@ public enum EItemValueType
     Name,
     Grade,
     Level,
+    End
+}
+
+public enum EStage
+{
+    None,
+    _1,
+    _2,
+    _3,
+    End
+}
+
+public enum EEquipStatType
+{
+    None,
+    Main,
+    Sub_0,
+    Sub_1,
     End
 }

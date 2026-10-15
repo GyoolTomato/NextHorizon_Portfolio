@@ -64,7 +64,7 @@ public partial class ServerAPI
             onFailure);
     }
 
-    public void Send_ArmorEquip(int characterKey, int id,
+    public void Send_ArmorEquip(int characterKey, EEquipmentType type, int id,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
@@ -72,6 +72,7 @@ public partial class ServerAPI
         {
             uid = GameData.Instance.pPlayerInfo.pUid,
             characterKey = characterKey,
+            type = type.ToString(),
             id = id,
         };
 
@@ -98,22 +99,23 @@ public partial class ServerAPI
             json => ParseResponse(json, Parse_WeaponEquip, onSuccess), onFailure);
     }
 
-    public void Send_ArmorRelease(int id,
+    public void Send_EquipmentLevelUp(int id, bool isArmor, EItemType[] eItemTypes, long[] counts,
         Action<bool> onSuccess, Action<ServerAPIError> onFailure)
     {
         //
-        SendJson("/api/armor/release", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerInventoryReleaseRequest { uid = GameData.Instance.pPlayerInfo.pUid, id = id }),
-            json => ParseResponse(json, Parse_ArmorRelease, onSuccess), onFailure);
-    }
+        ServerEquipmentLevelUpRequest request = new ServerEquipmentLevelUpRequest
+        {
+            uid = GameData.Instance.pPlayerInfo.pUid,
+            id = id,
+            isArmor = isArmor,
+            eItemTypes = eItemTypes,
+            counts = counts,
+        };
 
-    public void Send_WeaponRelease(int id,
-        Action<bool> onSuccess, Action<ServerAPIError> onFailure)
-    {
         //
-        SendJson("/api/weapon/release", UnityWebRequest.kHttpVerbPOST,
-            JsonUtility.ToJson(new ServerInventoryReleaseRequest { uid = GameData.Instance.pPlayerInfo.pUid, id = id }),
-            json => ParseResponse(json, Parse_WeaponRelease, onSuccess), onFailure);
+        SendJson("/api/equipment/level-up", UnityWebRequest.kHttpVerbPOST,
+            JsonUtility.ToJson(request),
+            json => ParseResponse(json, Parse_EquipmentLevelUp, onSuccess), onFailure);
     }
 
     private void Send_ItemOperation(string path, int itemKey, int quantity,
@@ -229,15 +231,22 @@ public partial class ServerAPI
     public bool Parse_ArmorEquip(string json)
     {
         //
-        ServerPlayerArmorData armor = JsonUtility.FromJson<ServerPlayerArmorData>(json);
+        ServerArmorEquipmentResponse response = JsonUtility.FromJson<ServerArmorEquipmentResponse>(json);
 
-        if (armor == null)
+        if (response == null || (response.equipped == null && response.released == null))
             return false;
 
         // Post-process
+        if (response.released != null)
+            GameData.Instance.pDataInventory.SetArmorEquipCharacter(
+                response.released.id, response.released.equipedCharacter);
+
+        if (response.equipped != null)
+            GameData.Instance.pDataInventory.SetArmorEquipCharacter(
+                response.equipped.id, response.equipped.equipedCharacter);
 
         //
-        var packet = new Observer.ArmorEquippedEvent(armor);
+        var packet = new Observer.ArmorEquippedEvent(response);
 
         //
         Observer.ObserverTracker<Observer.ArmorEquippedEvent>.Instance.Broadcast(packet);
@@ -249,15 +258,22 @@ public partial class ServerAPI
     public bool Parse_WeaponEquip(string json)
     {
         //
-        ServerPlayerWeaponData weapon = JsonUtility.FromJson<ServerPlayerWeaponData>(json);
+        ServerWeaponEquipmentResponse response = JsonUtility.FromJson<ServerWeaponEquipmentResponse>(json);
 
-        if (weapon == null)
+        if (response == null || (response.equipped == null && response.released == null))
             return false;
 
         // Post-process
+        if (response.released != null)
+            GameData.Instance.pDataInventory.SetWeaponEquipCharacter(
+                response.released.id, response.released.equipedCharacter);
+
+        if (response.equipped != null)
+            GameData.Instance.pDataInventory.SetWeaponEquipCharacter(
+                response.equipped.id, response.equipped.equipedCharacter);
 
         //
-        var packet = new Observer.WeaponEquippedEvent(weapon);
+        var packet = new Observer.WeaponEquippedEvent(response);
 
         //
         Observer.ObserverTracker<Observer.WeaponEquippedEvent>.Instance.Broadcast(packet);
@@ -266,43 +282,65 @@ public partial class ServerAPI
         return true;
     }
 
-    public bool Parse_ArmorRelease(string json)
+    public bool Parse_EquipmentLevelUp(string json)
     {
         //
-        ServerPlayerArmorData armor = JsonUtility.FromJson<ServerPlayerArmorData>(json);
+        ServerEquipmentLevelUpResponse response = JsonUtility.FromJson<ServerEquipmentLevelUpResponse>(json);
 
-        if (armor == null)
+        if (response == null)
             return false;
 
         // Post-process
+        if (response.isArmor)
+        {
+            if (response.armor == null)
+                return false;
+
+            var armor = GameData.Instance.pDataInventory.GetDataArmor(response.armor.id);
+            if (armor == null)
+                return false;
+
+            armor.SetLevel(response.armor.level);
+            armor.SetExp(response.armor.exp);
+        }
+        else
+        {
+            if (response.weapon == null)
+                return false;
+
+            var weapon = GameData.Instance.pDataInventory.GetDataWeapon(response.weapon.id);
+            if (weapon == null)
+                return false;
+
+            weapon.SetLevel(response.weapon.level);
+            weapon.SetExp(response.weapon.exp);
+        }
+
+        ApplyEquipmentLevelUpItems(response.items);
 
         //
-        var packet = new Observer.ArmorReleasedEvent(armor);
+        var packet = new Observer.EquipmentLevelUpEvent(response);
 
         //
-        Observer.ObserverTracker<Observer.ArmorReleasedEvent>.Instance.Broadcast(packet);
+        Observer.ObserverTracker<Observer.EquipmentLevelUpEvent>.Instance.Broadcast(packet);
 
         //
         return true;
     }
 
-    public bool Parse_WeaponRelease(string json)
+    private void ApplyEquipmentLevelUpItems(ServerPlayerItemData[] items)
     {
-        //
-        ServerPlayerWeaponData weapon = JsonUtility.FromJson<ServerPlayerWeaponData>(json);
+        if (items == null)
+            return;
 
-        if (weapon == null)
-            return false;
+        foreach (var item in items)
+        {
+            var tableInfo = _101_Items.GetItem(item.itemKey);
+            if (tableInfo == null)
+                continue;
 
-        // Post-process
-
-        //
-        var packet = new Observer.WeaponReleasedEvent(weapon);
-
-        //
-        Observer.ObserverTracker<Observer.WeaponReleasedEvent>.Instance.Broadcast(packet);
-
-        //
-        return true;
+            GameData.Instance.pDataInventory.GetDataItem(tableInfo.type)?.SetItemCount(item.quantity);
+        }
     }
+
 }

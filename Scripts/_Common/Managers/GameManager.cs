@@ -8,6 +8,9 @@ public class GameManager : MonoBehaviour
     //
     double _tckSecUpdateTime = 0d;
 
+    static EStage _selectedStage = EStage.None;
+    static int _selectedStageNum = 0;
+
 
     /// <summary>
     /// 
@@ -30,6 +33,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static void ChangeLogoScene()
     {
+        GameScene.Release();
         Timing.RunCoroutine(CoSceneChange(ESceneType.Logo), Segment.Update);
     }
 
@@ -38,6 +42,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public static void ChangeGameScene()
     {
+        LogoScene.Release();
         Timing.RunCoroutine(CoSceneChange(ESceneType.Game), Segment.Update);
     }
 
@@ -94,8 +99,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     void UpdateDatas()
     {
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="stage"></param>
+    /// <param name="stageNum"></param>
+    public static void SetSelectedStage(EStage stage, int stageNum)
+    {
+        _selectedStage = stage;
+        _selectedStageNum = stageNum;
     }
 }

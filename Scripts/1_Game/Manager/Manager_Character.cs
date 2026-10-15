@@ -28,100 +28,48 @@ public class Manager_Character : Singleton<Manager_Character>
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_Hp(DataCharacter character)
+    public decimal GetTotalStat(DataCharacter character, ECharacterStats stat)
     {
-        var temp = character.pTableInfo.hp + (character.pLevel * character.pTableInfo.hp_level);
+        //
+        var result = 0m;
 
-        return Math.Round(temp, 2);
-    }
+        //
+        switch (stat)
+        {
+            case ECharacterStats.HP:
+                result += Convert.ToDecimal(character.pTableInfo.hp) + (Convert.ToDecimal(character.pTableInfo.hp_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.ATK:
+                result += Convert.ToDecimal(character.pTableInfo.atk) + (Convert.ToDecimal(character.pTableInfo.atk_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.DEF:
+                result += Convert.ToDecimal(character.pTableInfo.def) + (Convert.ToDecimal(character.pTableInfo.def_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.Avoid:
+                result += Convert.ToDecimal(character.pTableInfo.avoid) + (Convert.ToDecimal(character.pTableInfo.avoid_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.Focus:
+                result += Convert.ToDecimal(character.pTableInfo.focus) + (Convert.ToDecimal(character.pTableInfo.focus_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.AtkSpd:
+                result += Convert.ToDecimal(character.pTableInfo.atkspd) + (Convert.ToDecimal(character.pTableInfo.atk_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.Speed:
+                result += Convert.ToDecimal(character.pTableInfo.speed);
+                break;
+            case ECharacterStats.Crirate:
+                result += Convert.ToDecimal(character.pTableInfo.crirate) + (Convert.ToDecimal(character.pTableInfo.crirate_level) * Convert.ToDecimal(character.pLevel));
+                break;
+            case ECharacterStats.Cridmg:
+                result += Convert.ToDecimal(character.pTableInfo.cridmg) + (Convert.ToDecimal(character.pTableInfo.cridmg_level) * Convert.ToDecimal(character.pLevel));
+                break;
+        }
+        
+        //
+        result += Manager_Inventory.Instance.GetCharacterEquipStat(character.pTableInfo.key, stat);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_Atk(DataCharacter character)
-    {
-        var temp = character.pTableInfo.atk + (character.pLevel * character.pTableInfo.atk_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_Def(DataCharacter character)
-    {
-        var temp = character.pTableInfo.def + (character.pLevel * character.pTableInfo.def_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_Avoid(DataCharacter character)
-    {
-        var temp = character.pTableInfo.avoid + (character.pLevel * character.pTableInfo.avoid_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_Focus(DataCharacter character)
-    {
-        var temp = character.pTableInfo.focus + (character.pLevel * character.pTableInfo.focus_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_AtkSpd(DataCharacter character)
-    {
-        var temp = character.pTableInfo.atkspd + (character.pLevel * character.pTableInfo.atkspd_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_CriRate(DataCharacter character)
-    {
-        var temp = character.pTableInfo.crirate + (character.pLevel * character.pTableInfo.crirate_level);
-
-        return Math.Round(temp, 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="character"></param>
-    /// <returns></returns>
-    public double GetStat_CriDmg(DataCharacter character)
-    {
-        var temp = character.pTableInfo.cridmg + (character.pLevel * character.pTableInfo.cridmg_level);
-
-        return Math.Round(temp, 2);
+        //
+        return result;
     }
 
     /// <summary>
@@ -154,7 +102,7 @@ public class Manager_Character : Singleton<Manager_Character>
                     {
                         continue;
                     }
-                    expCardValue = Convert.ToInt64(cardTableInfo.value) * amount[i];
+                    expCardValue = Convert.ToInt64(cardTableInfo.value_int) * amount[i];
                     break;
             }
 
@@ -285,7 +233,7 @@ public class Manager_Character : Singleton<Manager_Character>
     /// <returns></returns>
     public bool IsMaxLevel(int level)
     {
-        var maxLevel = _100_CommonValues.GetItem(1000001).value;
+        var maxLevel = _100_CommonValues.GetItem(1000001).value_int;
 
         return level >= maxLevel;
     }

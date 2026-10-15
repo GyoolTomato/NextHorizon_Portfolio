@@ -55,6 +55,27 @@ public class Manager_UI : Singleton<Manager_UI>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="panelType"></param>
+    /// <returns></returns>
+    Transform GetParentBoard(EPanelType panelType)
+    {
+        if (panelType > EPanelType.Board_2)
+        {
+            return _board_2;
+        }
+        else if (panelType > EPanelType.Board_1)
+        {
+            return _board_1;
+        }
+        else
+        {
+            return _board_0;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public bool CreatePanel(EPanelType panelType)
     {
         GameObject loadObject = null;
@@ -76,7 +97,8 @@ public class Manager_UI : Singleton<Manager_UI>
             loadObject = Manager_Addressable.Instance.GetPanel(panelType);
         }
 
-        var createObject = GameObject.Instantiate(loadObject, _board_0);
+        var parentBoard = GetParentBoard(panelType);
+        var createObject = GameObject.Instantiate(loadObject, parentBoard);
         if (createObject == null)
         {
             Debug.LogError("CreatePanel Create Fail! Panel Type : " + panelType);
@@ -93,6 +115,21 @@ public class Manager_UI : Singleton<Manager_UI>
 
         _dicPanels.Add(panelType, panelBase);
 
+        // 패널 순서 정렬
+        var indexSibling = parentBoard.childCount - 1;
+        for (int i = parentBoard.childCount - 2; i >= 0; i--)
+        {
+            var childPanelBase = parentBoard.GetChild(i).GetComponent<Panel_Base>();
+            if (panelType < childPanelBase.pPanelType)
+            {
+                indexSibling = childPanelBase.transform.GetSiblingIndex();
+            }
+            else
+                break;
+        }
+        panelBase.transform.SetSiblingIndex(indexSibling);
+
+        //
         return true;
     }
 
@@ -375,6 +412,25 @@ public class Manager_UI : Singleton<Manager_UI>
     /// <summary>
     /// 
     /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public string GetTextStage(int key)
+    {
+        var temp = _908_StageText.GetItem(key);
+        if (temp == null)
+            return string.Empty;
+
+        switch (_language)
+        {
+            case ELanguage.Korean: return temp.korean;
+            case ELanguage.Japanese: return temp.japanese;
+            default: return temp.english;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="stat"></param>
     /// <returns></returns>
     public string GetTextCharacterStats(ECharacterStats stat)
@@ -451,6 +507,31 @@ public class Manager_UI : Singleton<Manager_UI>
     /// <summary>
     /// 
     /// </summary>
+    /// <returns></returns>
+    public Color GetGradeColorHexaCode(EGrade grade)
+    {
+        return GetColorHexaCode(GetGradeColorText(grade));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public string GetGradeColorText(EGrade grade)
+    {
+        switch (grade)
+        {
+            case EGrade.Rare  : return _100_CommonValues.GetItem(1000007).value_text;
+            case EGrade.Elite : return _100_CommonValues.GetItem(1000008).value_text;
+            case EGrade.Epic  : return _100_CommonValues.GetItem(1000009).value_text;
+            case EGrade.Legend: return _100_CommonValues.GetItem(1000010).value_text;
+            default           : return _100_CommonValues.GetItem(1000006).value_text;
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
     /// <param name="tableInfo"></param>
     /// <returns></returns>
     public string GetSkillDesc(_103_CharacterSkills.Values tableInfo)
@@ -470,6 +551,24 @@ public class Manager_UI : Singleton<Manager_UI>
 
         //
         return desc;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public string GetEquipmentTypeText(EEquipmentType type)
+    {
+        switch (type)
+        {
+            case EEquipmentType.Weapon : return GetTextCommon(9000073);
+            case EEquipmentType.Hat    : return GetTextCommon(9000074);
+            case EEquipmentType.Clothes: return GetTextCommon(9000075);
+            case EEquipmentType.Gloves : return GetTextCommon(9000076);
+            case EEquipmentType.Shoes  : return GetTextCommon(9000077);
+            default                    : return "--";
+        }
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,19 +8,23 @@ using UnityEngine.UI;
 public class Panel_CharacterInfo : Panel_Base
 {
     //
-    [SerializeField] Com_ContentsTitle              _comTitle;
-    [SerializeField] TextMeshProUGUI                _name;
-    [SerializeField] TextMeshProUGUI                _level;   
-    [SerializeField] Image                          _characterImage;
-    [SerializeField] GameObject                     _btnLevelUp;
+    [SerializeField] Com_ContentsTitle _comTitle;
+    [SerializeField] TextMeshProUGUI   _name;
+    [SerializeField] TextMeshProUGUI   _level;
+    [SerializeField] Image             _characterImage;
+    [SerializeField] Com_Button        _btnLevelUp;
     
     [SerializeField] Com_CharacterInfo_Info_Stats   _comStats;
     [SerializeField] Com_CharacterInfo_Info_Skills  _comSkills;
 
-    [SerializeField] SubPanel_CharacterInfo_LevelUp _subLevelUp;
+    [SerializeField] Com_EquipmentSelct_Slot _comWeaponSlot = null;
+    [SerializeField] Com_EquipmentSelct_Slot _comArmorSlot_Hat = null;
+    [SerializeField] Com_EquipmentSelct_Slot _comArmorSlot_Clothes = null;
+    [SerializeField] Com_EquipmentSelct_Slot _comArmorSlot_Gloves = null;
+    [SerializeField] Com_EquipmentSelct_Slot _comArmorSlot_Shoes = null;
 
     //
-    DataCharacter _character = null;
+    DataCharacter _data = null;
 
 
     /// <summary>
@@ -40,13 +45,23 @@ public class Panel_CharacterInfo : Panel_Base
     {
         //
         _comTitle.Init(OnBtnClose);
-        _subLevelUp.gameObject.SetActive(false);
 
         //
-        _character = character;
+        _data = character;
+        _btnLevelUp.SetActive(true);
+        _btnLevelUp.SetBtn(OnBtnLevelUp);
 
         //
-        Refresh();     
+        Refresh();
+
+        ServerAPI.Instance.Send_StageClear(7000001, 0.1f, (isSuccess)=>
+        {
+
+        },
+        (error)=>
+        {
+
+        });
     }
 
     /// <summary>
@@ -55,12 +70,27 @@ public class Panel_CharacterInfo : Panel_Base
     public override void Refresh()
     {
         //
-        _name.text = Manager_UI.Instance.GetTextCharacter(_character.pTableInfo.name);
-        _characterImage.sprite = Manager_Resources.Instance.GetCharacterSprite(ECharacterImageType.FullBody, _character.pTableInfo.model);
-        _level.text = string.Format(Manager_UI.Instance.GetTextCommon(9000039), _character.pLevel);
-        _btnLevelUp.SetActive(!Manager_Character.Instance.IsMaxLevel(_character.pLevel));
-        _comStats.Init(_character);
-        _comSkills.Init(_character);
+        _name.text = Manager_UI.Instance.GetTextCharacter(_data.pTableInfo.name);
+        _characterImage.sprite = Manager_Resources.Instance.GetCharacterSprite(ECharacterImageType.FullBody, _data.pTableInfo.model);
+        _level.text = string.Format(Manager_UI.Instance.GetTextCommon(9000039), _data.pLevel);        
+        _btnLevelUp.gameObject.SetActive(!Manager_Character.Instance.IsMaxLevel(_data.pLevel));
+        _comStats.Init(_data);
+        _comSkills.Init(_data);
+
+        //
+        _comWeaponSlot.Init(_data.pTableInfo.key, EEquipmentType.Weapon, OnHide_WearEquipment);
+        _comArmorSlot_Hat.Init(_data.pTableInfo.key, EEquipmentType.Hat, OnHide_WearEquipment);
+        _comArmorSlot_Clothes.Init(_data.pTableInfo.key, EEquipmentType.Clothes, OnHide_WearEquipment);
+        _comArmorSlot_Gloves.Init(_data.pTableInfo.key, EEquipmentType.Gloves, OnHide_WearEquipment);
+        _comArmorSlot_Shoes.Init(_data.pTableInfo.key, EEquipmentType.Shoes, OnHide_WearEquipment);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    void OnHide_WearEquipment()
+    {
+        Refresh();
     }
 
     /// <summary>
@@ -74,25 +104,12 @@ public class Panel_CharacterInfo : Panel_Base
     /// <summary>
     /// 
     /// </summary>
-    public void OnBtnLevelUp()
+    void OnBtnLevelUp()
     {
-        _subLevelUp.Init(_character);
-        _subLevelUp.gameObject.SetActive(true);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public void OnBtnCloseLevelUp()
-    {
-        _subLevelUp.gameObject.SetActive(false);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public override void Tick()
-    {
-        _subLevelUp.Tick();
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.LevelUp) as Panel_LevelUp;
+        panel.Init(_data, ()=>
+        {
+            Refresh();
+        });
     }
 }

@@ -132,6 +132,8 @@ public class Panel_PlayerInfo : Panel_Base,
         //
         _introductionText.text = GD_playerInfo.pIntroduction;
         _btnEdit.SetText(Manager_UI.Instance.GetTextCommon(_isEditMode ? 9000001 : 9000066));
+        _introductionEdit.gameObject.SetActive(_isEditMode);
+        _introduction.gameObject.SetActive(_isEditMode == false);
 
         // Detail Infos
         //

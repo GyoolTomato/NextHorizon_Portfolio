@@ -199,12 +199,10 @@ public class Panel_Main : Panel_Base
     /// <summary>
     /// 
     /// </summary>
-    public void OnBtnWork()
+    public void OnBtnStageSelect()
     {
-        Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextCommon(9000016), Manager_UI.Instance.GetTextSystem(9990007), Panel_MessageBox.EType.OK, () =>
-        {
-            return;
-        });
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.StageSelect) as Panel_StageSelect;
+        panel.Init();
     }
 
     /// <summary>

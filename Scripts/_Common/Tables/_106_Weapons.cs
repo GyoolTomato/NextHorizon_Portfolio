@@ -12,17 +12,25 @@ public class _106_Weapons
         public int name { private set; get; }
         public int desc { private set; get; }
         public string icon { private set; get; }
-        public int value { private set; get; }
+        public ECharacterStats mainValueType { private set; get; }
+        public int mainValue { private set; get; }
+        public int mainValue_level { private set; get; }
+        public int subValue { private set; get; }
+        public int subValue_level { private set; get; }
 
         [JsonConstructor]
-        public Values(int key,EGrade grade,int name,int desc,string icon,int value)
+        public Values(int key,EGrade grade,int name,int desc,string icon,ECharacterStats mainValueType,int mainValue,int mainValue_level,int subValue,int subValue_level)
         {
             this.key = key;
             this.grade = grade;
             this.name = name;
             this.desc = desc;
             this.icon = icon;
-            this.value = value;
+            this.mainValueType = mainValueType;
+            this.mainValue = mainValue;
+            this.mainValue_level = mainValue_level;
+            this.subValue = subValue;
+            this.subValue_level = subValue_level;
         }
     }
 

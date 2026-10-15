@@ -29,14 +29,14 @@ public class Com_CharacterInfo_Info_Stats : Com_Base
         _character = character;
 
         //
-        _slotHP     .Init(ECharacterStats.HP     , Manager_Character.Instance.GetStat_Hp(_character));
-        _slotATK    .Init(ECharacterStats.ATK    , Manager_Character.Instance.GetStat_Atk(_character));
-        _slotDEF    .Init(ECharacterStats.DEF    , Manager_Character.Instance.GetStat_Def(_character));
-        _slotAvoid  .Init(ECharacterStats.Avoid  , Manager_Character.Instance.GetStat_Avoid(_character));
-        _slotFocus  .Init(ECharacterStats.Focus  , Manager_Character.Instance.GetStat_Focus(_character));
-        _slotAtkSpd .Init(ECharacterStats.AtkSpd , Manager_Character.Instance.GetStat_AtkSpd(_character));
-        _slotSpeed  .Init(ECharacterStats.Speed  , _character.pTableInfo.speed  );
-        _slotCriRate.Init(ECharacterStats.Crirate, Manager_Character.Instance.GetStat_CriRate(_character));
-        _slotCriDmg .Init(ECharacterStats.Cridmg , Manager_Character.Instance.GetStat_CriDmg(_character));
+        _slotHP     .Init(ECharacterStats.HP     , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.HP));
+        _slotATK    .Init(ECharacterStats.ATK    , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.ATK));
+        _slotDEF    .Init(ECharacterStats.DEF    , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.DEF));
+        _slotAvoid  .Init(ECharacterStats.Avoid  , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.Avoid));
+        _slotFocus  .Init(ECharacterStats.Focus  , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.Focus));
+        _slotAtkSpd .Init(ECharacterStats.AtkSpd , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.AtkSpd));
+        _slotSpeed  .Init(ECharacterStats.Speed  , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.Speed));
+        _slotCriRate.Init(ECharacterStats.Crirate, Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.Crirate));
+        _slotCriDmg .Init(ECharacterStats.Cridmg , Manager_Character.Instance.GetTotalStat(_character, ECharacterStats.Cridmg));
     }
 }

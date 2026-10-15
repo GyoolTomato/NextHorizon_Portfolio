@@ -44,6 +44,27 @@ public partial class ServerAPI : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    public void Clear()
+    {
+        //
+        bool hasActiveRequest = _activeRequestCount > 0;
+
+        //
+        StopAllCoroutines();
+
+        //
+        _activeRequestCount = 0;
+
+        //
+        if (hasActiveRequest)
+        {
+            Manager_UI.Instance.HideTouchLock();
+        }
+    }
+
     private void SendJson(
         string path,
         string method,

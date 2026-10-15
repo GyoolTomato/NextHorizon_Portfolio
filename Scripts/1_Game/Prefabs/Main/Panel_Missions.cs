@@ -60,6 +60,11 @@ public class Panel_Missions : Panel_Slots<Com_Missions_Slot>, Observer.IObserver
             {
                 item.Refresh();
             }
+
+            //
+
+
+            
         });       
     }
 }

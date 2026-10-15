@@ -48,7 +48,7 @@ public class Panel_Slots<T> : Panel_Base where T : Com_Base
    /// <summary>
    /// 
    /// </summary>
-    void DeactiveSlot(T slot)
+    public void DeactiveSlot(T slot)
     {
         //
         _slotPool.Push(slot);

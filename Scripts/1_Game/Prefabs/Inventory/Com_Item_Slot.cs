@@ -9,12 +9,7 @@ using UnityEngine.EventSystems;
 public class Com_Item_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
 {
     //
-    [SerializeField] GameObject _frame_Normal = null;
-    [SerializeField] GameObject _frame_Rare = null;
-    [SerializeField] GameObject _frame_Elite = null;
-    [SerializeField] GameObject _frame_Epic = null;
-    [SerializeField] GameObject _frame_Legend = null;
-
+    [SerializeField] Image _frame = null;
     [SerializeField] Image _icon = null;
 
     [SerializeField] TextMeshProUGUI _quantity = null;
@@ -49,14 +44,9 @@ public class Com_Item_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, I
         _type = type;
 
         //
-        _frame_Normal.SetActive(pData.pTableInfo.grade == EGrade.Normal);
-        _frame_Rare.SetActive(pData.pTableInfo.grade == EGrade.Rare);
-        _frame_Elite.SetActive(pData.pTableInfo.grade == EGrade.Elite);
-        _frame_Epic.SetActive(pData.pTableInfo.grade == EGrade.Epic);
-        _frame_Legend.SetActive(pData.pTableInfo.grade == EGrade.Legend);
-
-        //
-        _icon.sprite = Manager_Resources.Instance.GetIconSprite(pData.pTableInfo.key);
+        _frame.color = Manager_UI.Instance.GetGradeColorHexaCode(pData != null ? pData.pTableInfo.grade : EGrade.Normal);
+        _icon.gameObject.SetActive(pData != null);
+        _icon.sprite = pData != null ? Manager_Resources.Instance.GetIconSprite(pData.pTableInfo.key) : null;
 
         //
         Refresh();     
@@ -65,14 +55,14 @@ public class Com_Item_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, I
     /// <summary>
     /// 
     /// </summary>
-    public void Refresh()
+    public override void Refresh()
     {
         //
         if (_quantity != null)
-            _quantity.text = Manager_UI.Instance.BigNumberNotation(pData.pCount);
+            _quantity.text = pData != null ? Manager_UI.Instance.BigNumberNotation(pData.pCount) : string.Empty;
 
         if (_value != null)
-            _value.text = Manager_Inventory.Instance.GetValueText(pData, _type);
+            _value.text = pData != null ? Manager_Inventory.Instance.GetValueText(pData, _type) : string.Empty;
     }
 
     /// <summary>

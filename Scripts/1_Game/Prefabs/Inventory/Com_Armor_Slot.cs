@@ -9,12 +9,7 @@ using UnityEngine.UI;
 public class Com_Armor_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler
 {
     //
-    [SerializeField] GameObject _frame_Normal = null;
-    [SerializeField] GameObject _frame_Rare = null;
-    [SerializeField] GameObject _frame_Elite = null;
-    [SerializeField] GameObject _frame_Epic = null;
-    [SerializeField] GameObject _frame_Legend = null;
-
+    [SerializeField] Image _frame = null;
     [SerializeField] Image _icon = null;
 
     [SerializeField] TextMeshProUGUI _part = null;
@@ -50,20 +45,19 @@ public class Com_Armor_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, 
         _type = type;
 
         //
-        _frame_Normal.SetActive(pData.pTableInfo.grade == EGrade.Normal);
-        _frame_Rare.SetActive(pData.pTableInfo.grade == EGrade.Rare);
-        _frame_Elite.SetActive(pData.pTableInfo.grade == EGrade.Elite);
-        _frame_Epic.SetActive(pData.pTableInfo.grade == EGrade.Epic);
-        _frame_Legend.SetActive(pData.pTableInfo.grade == EGrade.Legend);
+        _frame.color = Manager_UI.Instance.GetGradeColorHexaCode(pData != null ? pData.pTableInfo.grade : EGrade.Normal);
+        _icon.gameObject.SetActive(pData != null);
+        _icon.sprite = pData != null ? Manager_Resources.Instance.GetIconSprite(pData.pTableInfo.key) : null;
 
         //
-        _icon.sprite = Manager_Resources.Instance.GetSprite(pData.pTableInfo.icon);
+        _part .gameObject.SetActive(pData != null);
+        _level.gameObject.SetActive(pData != null);
 
-        //
         if (_part != null)
             _part.text = string.Empty;
-        
-        
+
+        //
+        Refresh();
     }
 
     /// <summary>
@@ -74,16 +68,16 @@ public class Com_Armor_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, 
     public void Init(_105_Armors.Values tableInfo, EItemValueType type)
     {
         //
-        Init(new DataArmor(-1, 1, 0, 0, tableInfo), type);
+        Init(tableInfo != null ? new DataArmor(-1, 1, 0, 0, string.Empty, string.Empty, tableInfo) : null, type);
     }
 
     /// <summary>
     /// 
     /// </summary>
-    public void Refresh()
+    public override void Refresh()
     {
         //
-        if (_level != null)
+        if (_level != null && pData != null)
             _level.text = string.Format("+{0}", pData.pLevel);
 
         if (_value != null)
@@ -128,10 +122,14 @@ public class Com_Armor_Slot : Com_Base, IPointerDownHandler, IPointerUpHandler, 
         _isPressed = false;
 
         //
-        if (_onPointerUp == null)
+        if (_onPointerUp == null && pData != null)
         {
             var panel = Manager_UI.Instance.ShowPanel(EPanelType.PopUpInfo) as Panel_PopUpInfo;
-            panel.Init(transform.position, Manager_UI.Instance.GetTextArmor(pData.pTableInfo.name), Manager_UI.Instance.GetTextArmor(pData.pTableInfo.desc));
+            panel.Init(transform.position, Manager_UI.Instance.GetTextArmor(pData.pTableInfo.name), Manager_UI.Instance.GetTextArmor(pData.pTableInfo.desc),
+                Manager_UI.Instance.GetGradeColorText(pData.pTableInfo.grade), 
+                pData.pTableInfo.mainValueType, Manager_Inventory.Instance.GetEquipStat(pData, EEquipStatType.Main), 
+                pData.pSubValueType_0, Manager_Inventory.Instance.GetEquipStat(pData, EEquipStatType.Sub_0), 
+                pData.pSubValueType_1, Manager_Inventory.Instance.GetEquipStat(pData, EEquipStatType.Sub_1));
         }
         else
         {

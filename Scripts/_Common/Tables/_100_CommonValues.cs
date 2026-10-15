@@ -8,13 +8,17 @@ public class _100_CommonValues
     public class Values
     {
         public int key { private set; get; }
-        public double value { private set; get; }
+        public int value_int { private set; get; }
+        public double value_double { private set; get; }
+        public string value_text { private set; get; }
 
         [JsonConstructor]
-        public Values(int key,double value)
+        public Values(int key,int value_int,double value_double,string value_text)
         {
             this.key = key;
-            this.value = value;
+            this.value_int = value_int;
+            this.value_double = value_double;
+            this.value_text = value_text;
         }
     }
 

@@ -4,10 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Com_ContentsTitle : Com_Base
-{
-    //
-    [SerializeField] TextMeshProUGUI _title;
-
+{    
     //
     Action _onBtn;
 

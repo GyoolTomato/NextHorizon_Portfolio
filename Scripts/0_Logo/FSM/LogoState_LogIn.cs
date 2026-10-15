@@ -1,5 +1,3 @@
-using Firebase.Auth;
-using Firebase.Extensions;
 using UnityEngine;
 
 public class LogoState_LogIn : LogoState,
@@ -37,11 +35,13 @@ public class LogoState_LogIn : LogoState,
 
     public void DoLogin()
     {
+        //
         var panel = Manager_UI.Instance.GetPanel(EPanelType.Title) as Panel_Title;
         string localId = ProgramSettings.Instance.GetLocalUserId();
-        _isGuestLogin = panel.pComLogin.GetCurrentLogInType() == Com_Title_Login.EState.LogIn_Guest;
+        _isGuestLogin = Manager_Account.Instance.pLoginType == Manager_Account.ELoginType.Guest;
         panel.pComLogin.SetState(Com_Title_Login.EState.Loading);
 
+        //
         if (_isGuestLogin)
         {
             if (string.IsNullOrWhiteSpace(localId))
@@ -55,13 +55,15 @@ public class LogoState_LogIn : LogoState,
             return;
         }
 
-        FirebaseUser firebaseUser = FirebaseAuth.DefaultInstance?.CurrentUser;
-        if (firebaseUser == null) { Debug.LogError("Firebase current user is not ready."); return; }
-        firebaseUser.TokenAsync(false).ContinueWithOnMainThread(task => {
-            if (task.IsCanceled || task.IsFaulted) { Debug.LogError("Firebase token request failed: " + task.Exception); return; }
+        //
+        Manager_Account.Instance.GetFirebaseToken(token =>
+        {
             _loginLocalId = null;
-            _loginFirebaseToken = task.Result;
+            _loginFirebaseToken = token;
             ServerAPI.Instance.Send_FirebaseLogin(_loginFirebaseToken, success => { }, HandleRequestFailure);
+        }, exception =>
+        {
+            Debug.LogError("Firebase token request failed: " + exception);
         });
     }
 
@@ -78,6 +80,7 @@ public class LogoState_LogIn : LogoState,
         GameData.Instance.pDataInventory.Init(user.items, user.armors, user.weapons);
         GameData.Instance.pDataCharacter.Init(user.characters);
         GameData.Instance.pDataMissions.Init(user.missions);
+        GameData.Instance.pDataStage.Init(user.stageClears);
 
         //
         GameManager.ChangeGameScene();
