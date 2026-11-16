@@ -1,0 +1,206 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using TMPro;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.UI;
+
+public class Panel_Main : Panel_Base
+{
+    //
+    [SerializeField] RectTransform _rtPlayerInfo = null;
+    [SerializeField] RectTransform _rtTopLeft = null;
+    [SerializeField] RectTransform _rtTopRight_Top = null;
+    [SerializeField] RectTransform _rtBtnWorks = null;
+    [SerializeField] RectTransform _rtMenu = null;
+
+    [SerializeField] TextMeshProUGUI _playerLevel = null;
+    [SerializeField] TextMeshProUGUI _playerName = null;    
+    [SerializeField] TextMeshProUGUI _playerExp = null;
+    [SerializeField] RectTransform _playerExpSlider = null;
+
+    [SerializeField] Com_UserAssets _comUserAssets = null;
+
+    [SerializeField] TextMeshProUGUI _realTime = null;
+
+    //
+    StringBuilder _sb = new StringBuilder();
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    protected override void Awake()
+    {
+        //
+        base.Awake();
+
+        //
+        pPanelType = EPanelType.Main;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Init()
+    {
+        //
+        base.Init();
+
+        //
+        _comUserAssets.Init(EItemType.Crystal, EItemType.Gold);
+
+        //
+        Refresh();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Refresh()
+    {
+        //
+        _playerLevel.text = GD.pPlayerInfo.pLevel.ToString();
+        _playerName.text = GD.pPlayerInfo.pUserNickName;
+        _playerExp.text = string.Format("{0} / {1}", GD.pPlayerInfo.pExp, Manager_Table.Instance.GetPlayerLevelInfo(GD.pPlayerInfo.pLevel).expToNextLevel);
+        _playerExpSlider.localScale = new Vector3(
+            Convert.ToSingle(GD.pPlayerInfo.pExp) / Manager_Table.Instance.GetPlayerLevelInfo(GD.pPlayerInfo.pLevel).expToNextLevel, 
+            1f, 1f);
+
+        //
+        var textSupports = transform.GetComponentsInChildren<TextSupport>();
+        foreach (var item in textSupports)
+        {
+            item.ChangeText();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnPlayerInfo()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.PlayerInfo) as Panel_PlayerInfo;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnNotice()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Notice) as Panel_Notice;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnMissions()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Missions) as Panel_Missions;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnLobbyCharacter()
+    {
+        Manager_UI.Instance.ShowMessageBox(Manager_UI.Instance.GetTextCommon(9000044), Manager_UI.Instance.GetTextSystem(9990007), Panel_MessageBox.EType.OK, () =>
+        {
+            return;
+        });
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnSettings()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Settings) as Panel_Settings;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnChangeView()
+    {
+        //
+        var isHide = _rtPlayerInfo.gameObject.activeSelf;
+
+        //
+        _rtPlayerInfo  .gameObject.SetActive(!isHide);
+        _rtTopLeft     .gameObject.SetActive(!isHide);
+        _rtBtnWorks    .gameObject.SetActive(!isHide);
+        _rtMenu        .gameObject.SetActive(!isHide);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnStudents()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Characters) as Panel_Characters;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnFormation()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Formation) as Panel_Formation;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnInventory()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Inventory) as Panel_Inventory;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnShop()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Shop) as Panel_Shop;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnGacha()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.Gacha) as Panel_Gacha;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void OnBtnStageSelect()
+    {
+        var panel = Manager_UI.Instance.ShowPanel(EPanelType.StageSelect) as Panel_StageSelect;
+        panel.Init();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public override void Tick_Sec()
+    {
+        _sb.Clear();
+        _sb.Append(DateTime.Now.ToString("HH:mm:ss"));
+        _realTime.text = _sb.ToString();
+    }
+}

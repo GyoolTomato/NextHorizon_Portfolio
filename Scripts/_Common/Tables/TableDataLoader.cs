@@ -33,10 +33,12 @@ namespace Data
         public List<_111_WeaponLevel.Values> _list_111_WeaponLevel = new List<_111_WeaponLevel.Values>();
         public Dictionary<int, _112_ArmorLevel.Values> _dic_112_ArmorLevel = new Dictionary<int, _112_ArmorLevel.Values>();
         public List<_112_ArmorLevel.Values> _list_112_ArmorLevel = new List<_112_ArmorLevel.Values>();
+        public Dictionary<int, _113_Projectile.Values> _dic_113_Projectile = new Dictionary<int, _113_Projectile.Values>();
+        public List<_113_Projectile.Values> _list_113_Projectile = new List<_113_Projectile.Values>();
         public Dictionary<int, _700_StageList.Values> _dic_700_StageList = new Dictionary<int, _700_StageList.Values>();
         public List<_700_StageList.Values> _list_700_StageList = new List<_700_StageList.Values>();
-        public Dictionary<int, _701_Stage_1.Values> _dic_701_Stage_1 = new Dictionary<int, _701_Stage_1.Values>();
-        public List<_701_Stage_1.Values> _list_701_Stage_1 = new List<_701_Stage_1.Values>();
+        public Dictionary<int, _701_StageMonster.Values> _dic_701_StageMonster = new Dictionary<int, _701_StageMonster.Values>();
+        public List<_701_StageMonster.Values> _list_701_StageMonster = new List<_701_StageMonster.Values>();
         public Dictionary<int, _800_Notice.Values> _dic_800_Notice = new Dictionary<int, _800_Notice.Values>();
         public List<_800_Notice.Values> _list_800_Notice = new List<_800_Notice.Values>();
         public Dictionary<int, _900_CommonText.Values> _dic_900_CommonText = new Dictionary<int, _900_CommonText.Values>();
@@ -141,17 +143,23 @@ namespace Data
                 _list_112_ArmorLevel.Add(item);
                 _dic_112_ArmorLevel.Add(item.key, item);
             }
+            var temp_113_Projectile = JsonConvert.DeserializeObject<List<_113_Projectile.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_113_Projectile.bytes").text);
+            foreach (var item in temp_113_Projectile)
+            {
+                _list_113_Projectile.Add(item);
+                _dic_113_Projectile.Add(item.key, item);
+            }
             var temp_700_StageList = JsonConvert.DeserializeObject<List<_700_StageList.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_700_StageList.bytes").text);
             foreach (var item in temp_700_StageList)
             {
                 _list_700_StageList.Add(item);
                 _dic_700_StageList.Add(item.key, item);
             }
-            var temp_701_Stage_1 = JsonConvert.DeserializeObject<List<_701_Stage_1.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_701_Stage_1.bytes").text);
-            foreach (var item in temp_701_Stage_1)
+            var temp_701_StageMonster = JsonConvert.DeserializeObject<List<_701_StageMonster.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_701_StageMonster.bytes").text);
+            foreach (var item in temp_701_StageMonster)
             {
-                _list_701_Stage_1.Add(item);
-                _dic_701_Stage_1.Add(item.key, item);
+                _list_701_StageMonster.Add(item);
+                _dic_701_StageMonster.Add(item.key, item);
             }
             var temp_800_Notice = JsonConvert.DeserializeObject<List<_800_Notice.Values>>(Manager_Addressable.Instance.GetTable("Assets/Tables/_800_Notice.bytes").text);
             foreach (var item in temp_800_Notice)

@@ -8,6 +8,7 @@ public class _700_StageList
     public class Values
     {
         public int key { private set; get; }
+        public int monsterTable { private set; get; }
         public EStage stage { private set; get; }
         public int subNum { private set; get; }
         public int title { private set; get; }
@@ -16,12 +17,15 @@ public class _700_StageList
         public int goldCount { private set; get; }
         public int armorGroup { private set; get; }
         public int weaponGroup { private set; get; }
+        public int level { private set; get; }
+        public int level_gap { private set; get; }
         public int[] monsters { private set; get; }
 
         [JsonConstructor]
-        public Values(int key,EStage stage,int subNum,int title,int desc,int crystalCount,int goldCount,int armorGroup,int weaponGroup,int[] monsters)
+        public Values(int key,int monsterTable,EStage stage,int subNum,int title,int desc,int crystalCount,int goldCount,int armorGroup,int weaponGroup,int level,int level_gap,int[] monsters)
         {
             this.key = key;
+            this.monsterTable = monsterTable;
             this.stage = stage;
             this.subNum = subNum;
             this.title = title;
@@ -30,6 +34,8 @@ public class _700_StageList
             this.goldCount = goldCount;
             this.armorGroup = armorGroup;
             this.weaponGroup = weaponGroup;
+            this.level = level;
+            this.level_gap = level_gap;
             this.monsters = monsters;
         }
     }

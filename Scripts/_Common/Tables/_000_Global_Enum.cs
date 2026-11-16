@@ -12,6 +12,7 @@ public enum ESceneType
     None,
     Logo,
     Game,
+    Play,
     End
 }
 
@@ -29,6 +30,16 @@ public enum EGameState
     None,
     Main,
     Stage,
+    End
+}
+
+public enum EPlayState
+{
+    None,
+    Ready,
+    Pause,
+    Playing,
+    Finish,
     End
 }
 
@@ -53,6 +64,8 @@ public enum EPanelType
     CharacterSelect,
     WearEquipment,
     LevelUp,
+    BattleController,
+    BattleResult,
     Settings,
     Board_1,
     RewardBox,
@@ -98,6 +111,7 @@ public enum ECharacterState
     Attack,
     Die,
     Ceremony,
+    Skill,
     End
 }
 
@@ -116,7 +130,7 @@ public enum ECharacterImageType
 {
     None,
     FullBody,
-    UpperBody,
+    Icon,
     Portrait,
     ActiveSkill,
     PassiveSkill1,
@@ -131,6 +145,9 @@ public enum ECharacterStats
     HP_Level,
     ATK,
     ATK_Level,
+    AtkCoolTime,
+    AtkDelay,
+    AtkDistance,
     DEF,
     DEF_Level,
     Avoid,
@@ -211,5 +228,37 @@ public enum EEquipStatType
     Main,
     Sub_0,
     Sub_1,
+    End
+}
+
+public enum EAllyType
+{
+    None,
+    Ally,
+    Enemy,
+    Neutrality,
+    End
+}
+
+public enum ESpawnPoint
+{
+    None,
+    _None,
+    _Player,
+    _1,
+    _2,
+    _3,
+    _4,
+    _5,
+    _6,
+    _7,
+    _8,
+    End
+}
+
+public enum ESpawnType
+{
+    None,
+    Timer,
     End
 }
