@@ -336,17 +336,6 @@ Scripts/
 └─ _Common/      # 공통 매니저, UI 기반 클래스 및 테이블
 ```
 
-## 외부 에셋 및 라이선스
-
-데모 이미지와 APK에 등장하는 캐릭터 모델에는 유니티짱 라이선스에 따라 제공되는 에셋이 사용되었습니다.
-
-© Unity Technologies Japan/UCL
-
-- [유니티짱 라이선스](https://unity-chan.com/contents/license_jp/)
-- [캐릭터 이용 가이드라인](https://unity-chan.com/contents/guideline/)
-
-본 저장소에는 유니티짱 원본 모델 및 에셋 데이터가 포함되어 있지 않습니다.
-
 ## 안내
 
 - 이 저장소의 코드는 포트폴리오 열람 목적으로 공개합니다.
